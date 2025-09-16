@@ -14,6 +14,27 @@ RUN composer install --no-dev --optimize-autoloader
 # Droits sur storage et cache
 RUN chmod -R 775 storage bootstrap/cache
 
+# Installer les dépendances Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# Droits sur storage et cache
+RUN chmod -R 775 storage bootstrap/cache
+
+# --- AJOUT : définir les variables env pour build ---
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+ENV APP_KEY=base64:D+aegDt8iNcO68prCyMGMWOYmETqA+7QhsHFyRMnPpY=
+ENV DB_CONNECTION=mysql
+ENV DB_HOST=mysql.railway.internal
+ENV DB_PORT=3306
+ENV DB_DATABASE=railway
+ENV DB_USERNAME=root
+ENV DB_PASSWORD=fPMnlhOpTVAdgWLnSlEWDXNjAgeoKTUx
+
+# Compilation config Laravel
+RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
+
+
 # Compilation config Laravel
 RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
 
