@@ -31,12 +31,6 @@ ENV DB_DATABASE=railway
 ENV DB_USERNAME=root
 ENV DB_PASSWORD=fPMnlhOpTVAdgWLnSlEWDXNjAgeoKTUx
 
-# Compilation config Laravel
-RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
-
-
-# Compilation config Laravel
-RUN php artisan config:clear && php artisan cache:clear && php artisan config:cache
 
 # Compiler assets Laravel
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
