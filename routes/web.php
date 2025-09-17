@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PersonneController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MailTestController;
 use App\Http\Middleware\MustChangePassword;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +35,24 @@ Route::middleware(['auth', MustChangePassword::class])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    // --- Routes admin uniquement ---
+    Route::middleware([\App\Http\Middleware\RoleMiddleware::class . ':ADMINISTRATEUR'])->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        // Personnes CRUD (admin)
+        Route::get('/personnes', [PersonneController::class, 'index'])->name('personnes.index');
+        Route::get('/personnes/{personne}', [PersonneController::class, 'show'])->name('personnes.show');
+        Route::get('/personnes/{personne}/edit', [PersonneController::class, 'edit'])->name('personnes.edit');
+        Route::put('/personnes/{personne}', [PersonneController::class, 'update'])->name('personnes.update');
+        Route::delete('/personnes/{personne}', [PersonneController::class, 'destroy'])->name('personnes.destroy');
+    });
+
+    // Temporary route to test SMTP configuration (secured behind auth)
+    Route::get('/mail/test', [MailTestController::class, 'sendTest'])->name('mail.test');
     // autres routes internes protégées :
     // Route::get('/admin', [AdminController::class, 'index'])->name('admin');
     // Route::resource('/posts', PostController::class);

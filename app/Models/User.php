@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +20,6 @@ class User extends Authenticatable
     protected $fillable = [
         'password',
         'personne_id',
-        'role',
         'last_login',
         'actif',
         'must_change_password',
@@ -76,6 +76,26 @@ class User extends Authenticatable
     }
 
     /**
+     * Accessor pour récupérer le rôle depuis la table personne
+     */
+    public function getRoleAttribute()
+    {
+        // Primary source: personne.role
+        if ($this->relationLoaded('personne') && $this->personne) {
+            return $this->personne->role;
+        }
+
+        // Lazy-load personne if not loaded
+        if ($this->personne) {
+            return $this->personne->role;
+        }
+
+        // Fallback for legacy schema where users.role still exists (pre-migration)
+        $attributes = $this->getAttributes();
+        return $attributes['role'] ?? null;
+    }
+
+    /**
      * Get the name of the unique identifier for the user.
      *
      * @return string
@@ -116,5 +136,21 @@ class User extends Authenticatable
     public function findForPassport($username)
     {
         return $this->findByEmail($username);
+    }
+
+    /**
+     * Commandes effectuées par l'utilisateur
+     */
+    public function commandes()
+    {
+        return $this->hasMany(Commande::class, 'utilisateur_id');
+    }
+
+    /**
+     * Publications d'emploi du temps réalisées par l'utilisateur
+     */
+    public function edtPublications()
+    {
+        return $this->hasMany(EdtPublication::class, 'publie_par');
     }
 }

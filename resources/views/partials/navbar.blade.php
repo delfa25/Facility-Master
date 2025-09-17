@@ -1,8 +1,8 @@
-<div class="sticky top-0 z-50 flex justify-between items-center bg-gray-100 border-b-2 border-gray-200 px-4 py-2 ml-64">
+<div class="sticky top-0 z-50 flex justify-between items-center bg-gray-100 border-b-2 border-gray-200 px-4 py-4 ml-64">
     <div class="text-gray-600 font-bold text-lg">{{ date('d/m/Y') }}</div>
     <div class="flex items-center gap-4">
         @auth
-            <span class="hidden sm:inline text-sm text-gray-300">
+            <span class="hidden sm:inline text-sm text-black-500">
                 {{ Auth::user()->name ?? Auth::user()->email }}
             </span>
             <form method="POST" action="{{ route('logout') }}">

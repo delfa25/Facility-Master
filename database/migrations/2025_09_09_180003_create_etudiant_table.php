@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('etudiant', function (Blueprint $table) {
             $table->id();
-            $table->string('matricule', 30)->unique();
+            $table->string('INE', 13)->unique();
             $table->foreignId('personne_id')->constrained('personne');
             $table->date('date_inscription');
             $table->enum('statut', ['Actif','Suspendu','Diplome']);

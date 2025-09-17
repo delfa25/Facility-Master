@@ -57,9 +57,22 @@
                     <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
                 @enderror
             </div>
+            <div class="mb-6">
+                <label for="role" class="block text-sm font-medium text-gray-700">Rôle</label>
+                <select id="role" name="role" class="mt-1 p-3 block w-full border border-gray-300 outline-none rounded-md shadow-md">
+                    <option value="INVITE" {{ old('role') === 'INVITE' ? 'selected' : '' }}>INVITE</option>
+                    <option value="ETUDIANT" {{ old('role') === 'ETUDIANT' ? 'selected' : '' }}>ETUDIANT</option>
+                    <option value="ENSEIGNANT" {{ old('role') === 'ENSEIGNANT' ? 'selected' : '' }}>ENSEIGNANT</option>
+                    <option value="ADMINISTRATEUR" {{ old('role') === 'ADMINISTRATEUR' ? 'selected' : '' }}>ADMINISTRATEUR</option>
+                </select>
+                @error('role')
+                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                @enderror
+            </div>
             <button type="submit" class="w-full py-2 px-4 bg-purple-700 hover:bg-purple-500 text-white rounded-md">Valider</button>
+            <a href="{{ route('personnes.index') }}" class="mt-3 block w-full text-center py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md">Retour</a>
         </form>
-
+        
     </div>
 
 @endsection
