@@ -26,6 +26,17 @@
                                 @error('specialite')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label for="statut" class="form-label">Statut</label>
+                            <select name="statut" id="statut" class="form-select" required>
+                                <option value="INACTIF" {{ old('statut', $enseignant->statut) === 'INACTIF' ? 'selected' : '' }}>INACTIF</option>
+                                <option value="SUSPENDU" {{ old('statut', $enseignant->statut) === 'SUSPENDU' ? 'selected' : '' }}>SUSPENDU</option>
+                                <option value="ACTIF" {{ old('statut', $enseignant->statut) === 'ACTIF' ? 'selected' : '' }}>ACTIF</option>
+                            </select>
+                            @error('statut')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <div class="pt-4 flex space-x-3">
                             <button type="submit" class="px-4 py-2 bg-purple-700 hover:bg-purple-500 text-white rounded-md">Enregistrer</button>

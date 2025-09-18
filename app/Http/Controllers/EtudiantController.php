@@ -21,18 +21,18 @@ class EtudiantController extends Controller
                     ->orWhere('email', 'like', "%{$q}%");
             })->orWhere('INE', 'like', "%{$q}%");
         }
-        if ($statut && in_array($statut, ['INACTIF','Actif','Suspendu','Diplome'], true)) {
+        if ($statut && in_array($statut, ['INACTIF','ACTIF','SUSPENDU','DIPLOME'], true)) {
             $query->where('statut', $statut);
         }
         $etudiants = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
-        $statuts = ['INACTIF','Actif','Suspendu','Diplome'];
+        $statuts = ['INACTIF','ACTIF','SUSPENDU','DIPLOME'];
         // Quick counts
         $counts = [
             'total' => Etudiant::count(),
-            'inactif' => Etudiant::where('statut','INACTIF')->count(),
-            'actif' => Etudiant::where('statut','Actif')->count(),
-            'suspendu' => Etudiant::where('statut','Suspendu')->count(),
-            'diplome' => Etudiant::where('statut','Diplome')->count(),
+            'INACTIF' => Etudiant::where('statut','INACTIF')->count(),
+            'ACTIF' => Etudiant::where('statut','ACTIF')->count(),
+            'SUSPENDU' => Etudiant::where('statut','SUSPENDU')->count(),
+            'diplome' => Etudiant::where('statut','DIPLOME')->count(),
         ];
         return view('admin.etudiant.index', compact('etudiants','q','statut','statuts','counts'));
     }
@@ -46,7 +46,7 @@ class EtudiantController extends Controller
     public function edit(Etudiant $etudiant)
     {
         $etudiant->load('personne');
-        $statuts = ['INACTIF','Actif','Suspendu','Diplome'];
+        $statuts = ['INACTIF','ACTIF','SUSPENDU','DIPLOME'];
         return view('admin.etudiant.edit', compact('etudiant','statuts'));
     }
 
@@ -57,7 +57,7 @@ class EtudiantController extends Controller
                 'required','string','max:13',
                 Rule::unique('etudiant', 'INE')->ignore($etudiant->id),
             ],
-            'statut' => ['required', Rule::in(['INACTIF','Actif','Suspendu','Diplome'])],
+            'statut' => ['required', Rule::in(['INACTIF','ACTIF','SUSPENDU','DIPLOME'])],
             'date_inscription' => ['nullable','date'],
         ]);
 
@@ -72,13 +72,13 @@ class EtudiantController extends Controller
 
     public function inscrire(Etudiant $etudiant)
     {
-        // Only set to Actif if currently INACTIF
-        if ($etudiant->statut !== 'Actif') {
-            $etudiant->statut = 'Actif';
+        // Only set to ACTIF if currently INACTIF
+        if ($etudiant->statut !== 'ACTIF') {
+            $etudiant->statut = 'ACTIF';
             $etudiant->date_inscription = now();
             $etudiant->save();
         }
-        return back()->with('success', "L'étudiant a été inscrit (statut Actif).");
+        return back()->with('success', "L'étudiant a été inscrit (statut ACTIF).");
     }
 
     public function destroy(Etudiant $etudiant)

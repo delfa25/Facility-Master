@@ -15,6 +15,7 @@ class Enseignant extends Model
         'personne_id',
         'grade',
         'specialite',
+        'statut',
     ];
 
     /**

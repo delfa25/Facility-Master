@@ -35,7 +35,7 @@ class StudentController extends Controller
             'INE' => 'required|string|size:13|unique:etudiant,INE',
             'personne_id' => 'required|exists:personne,id',
             'date_inscription' => 'required|date|before_or_equal:today',
-            'statut' => 'required|in:Actif,Suspendu,Diplome',
+            'statut' => 'required|in:INACTIF,ACTIF,SUSPENDU,DIPLOME',
         ]);
     }
 

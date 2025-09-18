@@ -88,7 +88,7 @@ class Etudiant extends Model
      */
     public function scopeActifs($query)
     {
-        return $query->where('statut', 'Actif');
+        return $query->where('statut', 'ACTIF');
     }
 
     /**
@@ -96,7 +96,7 @@ class Etudiant extends Model
      */
     public function scopeSuspendus($query)
     {
-        return $query->where('statut', 'Suspendu');
+        return $query->where('statut', 'SUSPENDU');
     }
 
     /**
@@ -104,6 +104,6 @@ class Etudiant extends Model
      */
     public function scopeDiplomes($query)
     {
-        return $query->where('statut', 'Diplome');
+        return $query->where('statut', 'DIPLOME');
     }
 }

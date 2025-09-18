@@ -105,6 +105,7 @@ class RoleDemoSeeder extends Seeder
                         'personne_id' => $personne->id,
                         'grade' => null,
                         'specialite' => null,
+                        'statut' => 'INACTIF',
                     ]);
                     break;
                 default:

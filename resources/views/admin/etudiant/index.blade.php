@@ -17,11 +17,11 @@
                     </div>
                     <div class="bg-white shadow rounded p-4">
                         <div class="text-gray-500 text-sm">Actifs</div>
-                        <div class="text-2xl font-bold text-green-700">{{ $counts['actif'] ?? 0 }}</div>
+                        <div class="text-2xl font-bold text-green-700">{{ $counts['ACTIF'] ?? 0 }}</div>
                     </div>
                     <div class="bg-white shadow rounded p-4">
                         <div class="text-gray-500 text-sm">Inactifs</div>
-                        <div class="text-2xl font-bold text-gray-700">{{ $counts['inactif'] ?? 0 }}</div>
+                        <div class="text-2xl font-bold text-gray-700">{{ $counts['INACTIF'] ?? 0 }}</div>
                     </div>
                     <div class="bg-white shadow rounded p-4">
                         <div class="text-gray-500 text-sm">Diplômés</div>
@@ -63,9 +63,9 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $etudiant->personne->prenom ?? '' }} {{ $etudiant->personne->nom ?? '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                @if($etudiant->statut === 'Actif') bg-green-100 text-green-800 
+                                                @if($etudiant->statut === 'ACTIF') bg-green-100 text-green-800 
                                                 @elseif($etudiant->statut === 'INACTIF') bg-gray-100 text-gray-800 
-                                                @elseif($etudiant->statut === 'Suspendu') bg-yellow-100 text-yellow-800 
+                                                @elseif($etudiant->statut === 'SUSPENDU') bg-yellow-100 text-yellow-800 
                                                 @else bg-blue-100 text-blue-800 @endif">
                                                 {{ $etudiant->statut }}
                                             </span>

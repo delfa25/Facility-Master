@@ -12,6 +12,7 @@ class EnseignantController extends Controller
         $q = trim($request->get('q', ''));
         $grade = $request->get('grade');
         $specialite = $request->get('specialite');
+        $statut = $request->get('statut');
 
         $query = Enseignant::with('personne');
         if ($q !== '') {
@@ -26,6 +27,9 @@ class EnseignantController extends Controller
         }
         if ($specialite !== null && $specialite !== '') {
             $query->where('specialite', 'like', "%{$specialite}%");
+        }
+        if ($statut !== null && $statut !== '') {
+            $query->where('statut', $statut);
         }
 
         $enseignants = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
@@ -55,11 +59,13 @@ class EnseignantController extends Controller
         $request->validate([
             'grade' => ['nullable','string','max:50'],
             'specialite' => ['nullable','string','max:100'],
+            'statut' => ['required', 'in:INACTIF,SUSPENDU,ACTIF'],
         ]);
 
         $enseignant->update([
             'grade' => $request->grade,
             'specialite' => $request->specialite,
+            'statut' => $request->statut,
         ]);
 
         return redirect()->route('enseignants.show', $enseignant)->with('success', 'Enseignant mis à jour.');

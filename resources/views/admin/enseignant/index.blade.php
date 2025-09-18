@@ -30,6 +30,7 @@
                         <input type="text" name="q" value="{{ $q ?? '' }}" placeholder="Rechercher (nom, email)" class="p-2 border border-gray-300 rounded w-72">
                         <input type="text" name="grade" value="{{ $grade ?? '' }}" placeholder="Grade" class="p-2 border border-gray-300 rounded">
                         <input type="text" name="specialite" value="{{ $specialite ?? '' }}" placeholder="Spécialité" class="p-2 border border-gray-300 rounded">
+                        <input type="text" name="statut" value="{{ $statut ?? '' }}" placeholder="Statut" class="p-2 border border-gray-300 rounded">
                         <button type="submit" class="px-3 py-2 bg-gray-800 text-white rounded">Filtrer</button>
                     </form>
                 </div>
@@ -43,6 +44,7 @@
                                     <th class="border border-gray-300 px-4 py-2 text-left">Nom</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Grade</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Spécialité</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Statut</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
                                 </tr>
                             </thead>
@@ -53,6 +55,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->personne->prenom ?? '' }} {{ $enseignant->personne->nom ?? '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->grade ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->specialite ?? '-' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $enseignant->statut ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <div class="flex space-x-2">
                                                 <a class="text-blue-600 hover:text-blue-900" href="{{ route('enseignants.show', $enseignant) }}">Voir</a>

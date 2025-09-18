@@ -70,6 +70,10 @@ Route::middleware(['auth', MustChangePassword::class])->group(function () {
         Route::get('/enseignants/{enseignant}/edit', [\App\Http\Controllers\EnseignantController::class, 'edit'])->name('enseignants.edit');
         Route::put('/enseignants/{enseignant}', [\App\Http\Controllers\EnseignantController::class, 'update'])->name('enseignants.update');
         Route::delete('/enseignants/{enseignant}', [\App\Http\Controllers\EnseignantController::class, 'destroy'])->name('enseignants.destroy');
+        
+        // Parametres
+        Route::get('/parametres', [\App\Http\Controllers\ParametreController::class, 'parametreIndex'])->name('parametres.index');
+
     });
 
     // Temporary route to test SMTP configuration (secured behind auth)

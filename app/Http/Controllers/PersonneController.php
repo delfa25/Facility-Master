@@ -90,6 +90,7 @@ private static function generateIne(): string
                         'personne_id' => $personne->id,
                         'grade' => null,
                         'specialite' => null,
+                        'statut' => 'INACTIF',
                     ]);
                     break;
                 default:

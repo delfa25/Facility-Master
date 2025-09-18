@@ -63,7 +63,7 @@
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">Activer le compte</button>
                             </form>
                         @endif
-                        @if(optional($user->personne->etudiant)->statut !== null && $user->personne->etudiant->statut !== 'Actif')
+                        @if(optional($user->personne->etudiant)->statut !== null && $user->personne->etudiant->statut !== 'ACTIF')
                             <form action="{{ route('etudiants.inscrire', $user->personne->etudiant) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Inscrire l'étudiant</button>
