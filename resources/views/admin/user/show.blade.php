@@ -57,6 +57,18 @@
                     <div class="mt-6 flex space-x-3">
                         <a href="{{ route('users.edit', $user) }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">Modifier</a>
                         <a href="{{ route('users.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Retour</a>
+                        @if(!$user->actif)
+                            <form action="{{ route('users.activate', $user) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">Activer le compte</button>
+                            </form>
+                        @endif
+                        @if(optional($user->personne->etudiant)->statut !== null && $user->personne->etudiant->statut !== 'Actif')
+                            <form action="{{ route('etudiants.inscrire', $user->personne->etudiant) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Inscrire l'étudiant</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

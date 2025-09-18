@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class UserController extends Controller
 {
@@ -25,7 +27,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load('personne');
+        $user->load(['personne','personne.etudiant']);
         return view('admin.user.show', compact('user'));
     }
 
@@ -47,7 +49,7 @@ class UserController extends Controller
             'lieu_naissance' => 'required|string|max:100',
             'email' => [
                 'required','email','max:255',
-                Rule::unique('personne', 'email')->ignore($user->personne->id ?? null)->whereNull('deleted_at'),
+                Rule::unique('personne', 'email')->ignore($user->personne->id ?? null),
             ],
             'phone' => 'required|string|max:30',
             'role' => ['required', Rule::in(['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT','INVITE'])],
@@ -75,6 +77,30 @@ class UserController extends Controller
         ]);
 
         return redirect()->route('users.show', $user)->with('success', 'Utilisateur mis à jour avec succès.');
+    }
+
+    public function activate(User $user)
+    {
+        if ($user->actif) {
+            return back()->with('success', 'Le compte est déjà actif.');
+        }
+
+        $user->actif = true;
+        $user->save();
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+            $msg = 'Compte activé et e-mail de bienvenue envoyé.';
+        } catch (\Throwable $e) {
+            \Log::warning('Activation mail send failed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+            $msg = "Compte activé, mais l'envoi de l'e-mail a échoué.";
+        }
+
+        return back()->with('success', $msg);
     }
 
 }

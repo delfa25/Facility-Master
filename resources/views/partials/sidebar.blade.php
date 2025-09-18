@@ -4,8 +4,8 @@
     </a>
     <ul class="flex flex-col">
         <li class="nav-item"><a href="{{ route('dashboard') }}" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Tableau de Bord</a></li>
-        <li class="nav-item"><a href="#" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des étudiants</a></li>
-        <li class="nav-item"><a href="#" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des professeurs</a></li>
+        <li class="nav-item"><a href="{{ route('etudiants.index') }}" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des étudiants</a></li>
+        <li class="nav-item"><a href="{{ route('enseignants.index') }}" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des professeurs</a></li>
         <li class="nav-item"><a href="#" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des filières</a></li>
         <li class="nav-item"><a href="#" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des classes</a></li>
         <li class="nav-item"><a href="{{ route('users.index') }}" class="block px-5 py-2 text-gray-800 hover:bg-gray-200 hover:text-black">Gestion des utilisateurs</a></li>

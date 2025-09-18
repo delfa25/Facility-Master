@@ -35,6 +35,12 @@ class AuthController extends Controller
         $user = User::findByEmail($request->email);
 
         if ($user && Hash::check($request->password, $user->password)) {
+            // Interdire la connexion si le compte est inactif
+            if (!$user->actif) {
+                return back()->withErrors([
+                    'email' => "Votre compte est inactif. Veuillez contacter l'administrateur.",
+                ]);
+            }
             $remember = $request->has('remember');
             Auth::login($user, $remember);
             $request->session()->regenerate();

@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 use App\Models\Personne;
 use App\Models\User;
+use App\Models\Etudiant;
+use App\Models\Enseignant;
 use Illuminate\Validation\Rule;
 
 class PersonneController extends Controller
@@ -16,6 +19,15 @@ class PersonneController extends Controller
     public function showPersonneForm(){
         return view('admin.personne.create');
     }
+
+// Helpers
+private static function generateIne(): string
+{
+    // Générer un code 13 chars: YY + rand(11 chiffres)
+    $yy = now()->format('y');
+    $rand = str_pad((string)random_int(0, 99999999999), 11, '0', STR_PAD_LEFT);
+    return $yy . $rand;
+}
 
     public function personne(Request $request)
     {
@@ -30,42 +42,63 @@ class PersonneController extends Controller
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('personne', 'email')->whereNull('deleted_at'),
+                Rule::unique('personne', 'email'),
             ],
             'phone' => 'required|string|max:30',
             'role' => 'required|in:ADMINISTRATEUR,ENSEIGNANT,ETUDIANT,INVITE',
         ]);
 
-        // Créer d'abord la personne
-        $personne = Personne::create([
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'date_naissance' => $request->date_naissance,
-            'lieu_naissance' => $request->lieu_naissance,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            // Rôle désormais stocké sur personne
-            'role' => $request->role ?? 'INVITE',
-        ]);
+        $message = null;
 
-        // Puis créer l'utilisateur lié à cette personne
-        $user = User::create([
-            'password' => Hash::make('facilitypass'),
-            'personne_id' => $personne->id,
-            'actif' => true,
-            'must_change_password' => true,
-        ]);
-        
-        try {
-            Mail::to($user->personne->email)->send(new WelcomeMail($user));
-            $message = 'Inscription réussie ! Un e-mail de bienvenue a été envoyé.';
-        } catch (\Throwable $e) {
-            \Log::warning('Mail send failed (welcome mail)', [
-                'to' => $user->personne->email,
-                'error' => $e->getMessage(),
+        DB::transaction(function () use ($request, &$message) {
+            // Créer d'abord la personne
+            $personne = Personne::create([
+                'nom' => $request->nom,
+                'prenom' => $request->prenom,
+                'date_naissance' => $request->date_naissance,
+                'lieu_naissance' => $request->lieu_naissance,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                // Rôle désormais stocké sur personne
+                'role' => $request->role ?? 'INVITE',
             ]);
-            $message = "Inscription réussie, mais l'envoi de l'e-mail a échoué (configuration SMTP).";
-        }
+
+            // Créer l'utilisateur lié (inactif par défaut, pas d'e-mail maintenant)
+            $user = User::create([
+                'password' => Hash::make('facilitypass'),
+                'personne_id' => $personne->id,
+                'actif' => false,
+                'must_change_password' => true,
+            ]);
+
+            // Création spécifique au rôle
+            switch ($personne->role) {
+                case 'ETUDIANT':
+                    // Générer un INE unique de 13 caractères (simple exemple)
+                    $ine = self::generateIne();
+                    // Créer Etudiant avec statut INACTIF et date_inscription NULL (selon nouvelle migration)
+                    Etudiant::create([
+                        'INE' => $ine,
+                        'personne_id' => $personne->id,
+                        'date_inscription' => null,
+                        'statut' => 'INACTIF',
+                    ]);
+                    break;
+                case 'ENSEIGNANT':
+                    // Champs minimaux uniquement
+                    Enseignant::create([
+                        'personne_id' => $personne->id,
+                        'grade' => null,
+                        'specialite' => null,
+                    ]);
+                    break;
+                default:
+                    // Aucun enregistrement spécifique
+                    break;
+            }
+
+            $message = "Inscription réussie. Le compte est en attente d'activation par un administrateur.";
+        });
 
         return back()->with('success', $message);
     }
@@ -133,7 +166,7 @@ class PersonneController extends Controller
             'lieu_naissance' => 'required|string|max:100',
             'email' => [
                 'required','email','max:255',
-                Rule::unique('personne', 'email')->ignore($personne->id)->whereNull('deleted_at'),
+                Rule::unique('personne', 'email')->ignore($personne->id),
             ],
             'phone' => 'required|string|max:30',
             'role' => ['required', Rule::in(['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT','INVITE'])],
