@@ -47,7 +47,7 @@ class AuthController extends Controller
 
             // Redirection obligatoire si le mot de passe doit être changé
             if ($user->must_change_password) {
-                return redirect()->route('password.change.form');
+                return redirect()->route('password.edit');
             }
 
             return redirect()->intended('/dashboard');

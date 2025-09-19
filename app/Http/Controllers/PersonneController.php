@@ -2,34 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\DB;
 use App\Models\Personne;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Etudiant;
 use App\Models\Enseignant;
-use Illuminate\Validation\Rule;
+use App\Support\IdGenerator;
 
 class PersonneController extends Controller
 {
-    public function showPersonneForm(){
+    // Resource: afficher le formulaire de création
+    public function create()
+    {
         return view('admin.personne.create');
     }
 
-// Helpers
-private static function generateIne(): string
-{
-    // Générer un code 13 chars: YY + rand(11 chiffres)
-    $yy = now()->format('y');
-    $rand = str_pad((string)random_int(0, 99999999999), 11, '0', STR_PAD_LEFT);
-    return $yy . $rand;
-}
-
-    public function personne(Request $request)
+    // Resource: enregistrer une nouvelle personne
+    public function store(Request $request)
     {
         // Validation des données du formulaire
         $request->validate([
@@ -38,10 +30,7 @@ private static function generateIne(): string
             'date_naissance' => 'required|date|before:today',
             'lieu_naissance' => 'required|string|max:255',
             'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
+                'required','string','email','max:255',
                 Rule::unique('personne', 'email'),
             ],
             'phone' => 'required|string|max:30',
@@ -51,7 +40,7 @@ private static function generateIne(): string
         $message = null;
 
         DB::transaction(function () use ($request, &$message) {
-            // Créer d'abord la personne
+            // Créer la personne
             $personne = Personne::create([
                 'nom' => $request->nom,
                 'prenom' => $request->prenom,
@@ -59,24 +48,21 @@ private static function generateIne(): string
                 'lieu_naissance' => $request->lieu_naissance,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                // Rôle désormais stocké sur personne
                 'role' => $request->role ?? 'INVITE',
             ]);
 
-            // Créer l'utilisateur lié (inactif par défaut, pas d'e-mail maintenant)
-            $user = User::create([
+            // Créer l'utilisateur lié (inactif par défaut)
+            User::create([
                 'password' => Hash::make('facilitypass'),
                 'personne_id' => $personne->id,
                 'actif' => false,
                 'must_change_password' => true,
             ]);
 
-            // Création spécifique au rôle
+            // Spécifique au rôle
             switch ($personne->role) {
                 case 'ETUDIANT':
-                    // Générer un INE unique de 13 caractères (simple exemple)
-                    $ine = self::generateIne();
-                    // Créer Etudiant avec statut INACTIF et date_inscription NULL (selon nouvelle migration)
+                    $ine = IdGenerator::generateINE();
                     Etudiant::create([
                         'INE' => $ine,
                         'personne_id' => $personne->id,
@@ -85,7 +71,6 @@ private static function generateIne(): string
                     ]);
                     break;
                 case 'ENSEIGNANT':
-                    // Champs minimaux uniquement
                     Enseignant::create([
                         'personne_id' => $personne->id,
                         'grade' => null,
@@ -101,11 +86,7 @@ private static function generateIne(): string
             $message = "Inscription réussie. Le compte est en attente d'activation par un administrateur.";
         });
 
-        return back()->with('success', $message);
-    }
-
-    public function updatePersonneForm($id){
-
+        return redirect()->route('personnes.index')->with('success', $message);
     }
 
     public function destroy(Personne $personne)
@@ -148,7 +129,7 @@ private static function generateIne(): string
 
     public function show(Personne $personne)
     {
-        $personne->load('user');
+        $personne->load(['user','etudiant.inscriptions.classe','etudiant.inscriptions.anneeAcad']);
         return view('admin.personne.show', compact('personne'));
     }
 

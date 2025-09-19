@@ -11,8 +11,8 @@ class MustChangePassword
     {
         if (Auth::check() && (bool) Auth::user()->must_change_password) {
             // Autoriser l'accès aux routes de changement de mot de passe et au logout pour éviter les boucles
-            if (! $request->routeIs('password.change.*') && ! $request->routeIs('logout')) {
-                return redirect()->route('password.change.form');
+            if (! $request->routeIs('password.*') && ! $request->routeIs('logout')) {
+                return redirect()->route('password.edit');
             }
         }
 

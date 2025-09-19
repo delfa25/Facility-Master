@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Etudiant;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class EtudiantController extends Controller
 {
@@ -39,7 +40,7 @@ class EtudiantController extends Controller
 
     public function show(Etudiant $etudiant)
     {
-        $etudiant->load('personne');
+        $etudiant->load(['personne','inscriptions.classe','inscriptions.anneeAcad']);
         return view('admin.etudiant.show', compact('etudiant'));
     }
 
@@ -52,7 +53,19 @@ class EtudiantController extends Controller
 
     public function update(Request $request, Etudiant $etudiant)
     {
+        // Validate both Etudiant and linked Personne fields
         $request->validate([
+            // Personne
+            'nom' => ['required','string','max:100'],
+            'prenom' => ['required','string','max:100'],
+            'date_naissance' => ['required','date','before:today'],
+            'lieu_naissance' => ['required','string','max:100'],
+            'email' => [
+                'required','email','max:255',
+                Rule::unique('personne', 'email')->ignore($etudiant->personne->id ?? null),
+            ],
+            'phone' => ['required','string','max:30'],
+            // Etudiant
             'INE' => [
                 'required','string','max:13',
                 Rule::unique('etudiant', 'INE')->ignore($etudiant->id),
@@ -61,13 +74,28 @@ class EtudiantController extends Controller
             'date_inscription' => ['nullable','date'],
         ]);
 
-        $etudiant->update([
-            'INE' => $request->INE,
-            'statut' => $request->statut,
-            'date_inscription' => $request->date_inscription,
-        ]);
+        DB::transaction(function () use ($request, $etudiant) {
+            // Update linked Personne
+            if ($etudiant->personne) {
+                $etudiant->personne->update([
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'date_naissance' => $request->date_naissance,
+                    'lieu_naissance' => $request->lieu_naissance,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                ]);
+            }
 
-        return redirect()->route('etudiants.show', $etudiant)->with('success', 'Étudiant mis à jour.');
+            // Update Etudiant
+            $etudiant->update([
+                'INE' => $request->INE,
+                'statut' => $request->statut,
+                'date_inscription' => $request->date_inscription,
+            ]);
+        });
+
+        return redirect()->route('etudiants.show', $etudiant)->with('success', 'Étudiant et personne mis à jour.');
     }
 
     public function inscrire(Etudiant $etudiant)

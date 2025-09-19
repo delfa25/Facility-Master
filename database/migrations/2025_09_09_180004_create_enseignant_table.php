@@ -11,8 +11,9 @@ return new class extends Migration
         Schema::create('enseignant', function (Blueprint $table) {
             $table->id();
             $table->foreignId('personne_id')->constrained('personne');
-            $table->string('grade', 50);
-            $table->string('specialite', 100);
+            $table->string('grade', 50)->nullable();
+            $table->string('specialite', 100)->nullable();
+            $table->enum('statut', ['INACTIF','SUSPENDU','ACTIF'])->default('INACTIF');
             $table->timestamps();
         });
     }

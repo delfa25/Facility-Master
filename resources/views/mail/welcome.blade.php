@@ -11,7 +11,7 @@
     <h1>Bonjour {{ $user['name'] }} </h1>
     <p>Nous sommes ravis de vous compter parmi nous.</p>
     <p>Vous pouvez vous connecter à votre compte en utilisant le lien ci-dessous :</p>
-    <a href="{{ route('login') }}">Se connecter</a>
+    <a href="{{ route('login') }}">Facility Master</a>
 
 </body>
 </html>

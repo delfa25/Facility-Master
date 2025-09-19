@@ -6,27 +6,37 @@
 
     <div class="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
 
+        <h1 class="text-2xl font-bold mb-6">Changer mon mot de passe</h1>
+
         @if(session('success'))
-            <div class="bg-red-100 border border-green-400 text-green-700 px-4 py-3 rounded-relative" role="alert">
-                <strong class="font-bold">Success !<strong>
-                <span class="block sm:inline">{{ session('success') }}</span>
-            </div>    
+            <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
+                {{ session('success') }}
+            </div>
         @endif
 
-        <form action="{{ route('password.change.submit') }}" method="post" class="mt-6">
+        <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
             @csrf
+            @method('PUT')
+
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
-                <input class="mt-1 p-3 block w-full border border-gray-300 outline-none rounded-md shadow-md" type="password" id="password" name="password">
+                <label for="password" class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
+                <input id="password" name="password" type="password" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
                 @error('password')
-                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmer votre mot de passe</label>
-                <input class="mt-1 p-3 block w-full border border-gray-300 outline-none rounded-md shadow-md" type="password" id="password_confirmation" name="password_confirmation">
+                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
+                <input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 p-3 w-full border border-gray-300 rounded-md" required>
             </div>
-            <button type="submit" class="w-full py-2 px-4 bg-purple-700 hover:bg-purple-500 text-white rounded-md">Confirmer</button>
+
+            <div class="pt-2 flex space-x-3">
+                <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md">
+                    Mettre à jour
+                </button>
+                <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Annuler</a>
+            </div>
         </form>
 
     </div>

@@ -88,17 +88,7 @@ class UserController extends Controller
         $user->actif = true;
         $user->save();
 
-        try {
-            Mail::to($user->email)->send(new WelcomeMail($user));
-            $msg = 'Compte activé et e-mail de bienvenue envoyé.';
-        } catch (\Throwable $e) {
-            \Log::warning('Activation mail send failed', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'error' => $e->getMessage(),
-            ]);
-            $msg = "Compte activé, mais l'envoi de l'e-mail a échoué.";
-        }
+        $msg = 'Compte activé.';
 
         return back()->with('success', $msg);
     }

@@ -75,6 +75,15 @@
                                             <div class="flex space-x-2">
                                                 <a class="text-blue-600 hover:text-blue-900" href="{{ route('etudiants.show', $etudiant) }}">Voir</a>
                                                 <a class="text-green-600 hover:text-green-900" href="{{ route('etudiants.edit', $etudiant) }}">Modifier</a>
+                                                @if($etudiant->statut !== 'DIPLOME')
+                                                    <a class="text-indigo-600 hover:text-indigo-900" href="{{ route('inscriptions.create', ['etudiant' => $etudiant->id]) }}">Nouvelle inscription</a>
+                                                @endif
+                                                @if($etudiant->statut !== 'ACTIF')
+                                                    <form action="{{ route('etudiants.inscrire', $etudiant) }}" method="POST" class="inline" onsubmit="return confirm('Inscrire cet étudiant ?')">
+                                                        @csrf
+                                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900">Inscrire</button>
+                                                    </form>
+                                                @endif
                                                 <form action="{{ route('etudiants.destroy', $etudiant) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer cet étudiant ?')">
                                                     @csrf
                                                     @method('DELETE')

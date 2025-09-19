@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('INE', 13)->unique();
             $table->foreignId('personne_id')->constrained('personne');
-            $table->date('date_inscription');
-            $table->enum('statut', ['INACTIF','ACTIF','SUSPENDU','DIPLOME'])->default('INACTIF');            $table->timestamps();
+            $table->date('date_inscription')->nullable();
+            $table->enum('statut', ['INACTIF','ACTIF','SUSPENDU','DIPLOME'])->default('INACTIF');
+            $table->timestamps();
         });
     }
 

@@ -40,6 +40,7 @@
                     <div class="mt-6 flex space-x-3">
                         <a href="{{ route('etudiants.edit', $etudiant) }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">Modifier</a>
                         <a href="{{ route('etudiants.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Retour</a>
+                        <a href="{{ route('inscriptions.create', ['etudiant' => $etudiant->id]) }}" class="px-4 py-2 bg-indigo-700 text-white rounded hover:bg-indigo-600">Nouvelle inscription</a>
                         @if($etudiant->statut !== 'ACTIF')
                             <form action="{{ route('etudiants.inscrire', $etudiant) }}" method="POST" class="inline">
                                 @csrf
@@ -47,6 +48,31 @@
                             </form>
                         @endif
                     </div>
+                    @if(($etudiant->inscriptions ?? collect())->count())
+                        <div class="mt-8">
+                            <h2 class="text-lg font-semibold mb-3">Historique des inscriptions</h2>
+                            <div class="overflow-x-auto">
+                                <table class="w-full border-collapse border border-gray-300">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="border border-gray-300 px-4 py-2 text-left">Classe</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-left">Année académique</th>
+                                            <th class="border border-gray-300 px-4 py-2 text-left">Date d'inscription</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($etudiant->inscriptions as $ins)
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="border border-gray-300 px-4 py-2">{{ $ins->classe->libelle ?? ($ins->classe->code ?? ('Classe #'.$ins->classe_id)) }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">{{ $ins->anneeAcad->annee ?? ('Année #'.$ins->annee_id) }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">{{ optional($ins->date_inscription)->format('d/m/Y') }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </main>

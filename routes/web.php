@@ -4,7 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PersonneController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\MailTestController;
 use App\Http\Middleware\MustChangePassword;
 use Illuminate\Support\Facades\Route;
 
@@ -17,15 +16,15 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/personne', [PersonneController::class, 'showPersonneForm'])->name('personne');
-Route::post('/personne', [PersonneController::class, 'personne'])->name('personne.submit');
+// Routes publiques d'inscription personne supprimées (plus utilisées)
 
 // --- Routes accessibles si connecté (auth) ---
 // Ici on met SEULEMENT les routes qui doivent être accessibles
 // avant d’avoir changé le mot de passe
 Route::middleware('auth')->group(function () {
-    Route::get('/password/change', [PasswordController::class, 'showChangeForm'])->name('password.change.form');
-    Route::post('/password/change', [PasswordController::class, 'changePassword'])->name('password.change.submit');
+    // Password as resource-like: edit/update
+    Route::get('/password/change', [PasswordController::class, 'showChangeForm'])->name('password.edit');
+    Route::put('/password/change', [PasswordController::class, 'changePassword'])->name('password.update');
 });
 
 // --- Routes accessibles si connecté ET mot de passe changé ---
@@ -42,43 +41,44 @@ Route::middleware(['auth', MustChangePassword::class])->group(function () {
 
     // --- Routes admin uniquement ---
     Route::middleware([\App\Http\Middleware\RoleMiddleware::class . ':ADMINISTRATEUR'])->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
-        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::resource('users', UserController::class)->only(['index','show','edit','update','destroy']);
         Route::post('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
         // Personnes CRUD (admin)
-        Route::get('/personnes', [PersonneController::class, 'index'])->name('personnes.index');
-        Route::get('/personnes/{personne}', [PersonneController::class, 'show'])->name('personnes.show');
-        Route::get('/personnes/{personne}/edit', [PersonneController::class, 'edit'])->name('personnes.edit');
-        Route::put('/personnes/{personne}', [PersonneController::class, 'update'])->name('personnes.update');
-        Route::delete('/personnes/{personne}', [PersonneController::class, 'destroy'])->name('personnes.destroy');
+        Route::resource('personnes', PersonneController::class)
+            ->only(['index','create','store','show','edit','update','destroy']);
 
         // Étudiants CRUD + inscription
-        Route::get('/etudiants', [\App\Http\Controllers\EtudiantController::class, 'index'])->name('etudiants.index');
-        Route::get('/etudiants/{etudiant}', [\App\Http\Controllers\EtudiantController::class, 'show'])->name('etudiants.show');
-        Route::get('/etudiants/{etudiant}/edit', [\App\Http\Controllers\EtudiantController::class, 'edit'])->name('etudiants.edit');
-        Route::put('/etudiants/{etudiant}', [\App\Http\Controllers\EtudiantController::class, 'update'])->name('etudiants.update');
+        Route::resource('etudiants', \App\Http\Controllers\EtudiantController::class)
+            ->only(['index','show','edit','update','destroy']);
         Route::post('/etudiants/{etudiant}/inscrire', [\App\Http\Controllers\EtudiantController::class, 'inscrire'])->name('etudiants.inscrire');
-        Route::delete('/etudiants/{etudiant}', [\App\Http\Controllers\EtudiantController::class, 'destroy'])->name('etudiants.destroy');
+
+        // Inscriptions scolaires (processus complet)
+        Route::resource('inscriptions', \App\Http\Controllers\InscriptionController::class)
+            ->only(['index','create','store']);
+
+        // Filières & Années académiques
+        Route::resource('filieres', \App\Http\Controllers\FiliereController::class);
+        Route::resource('annees', \App\Http\Controllers\AnneeAcadController::class);
+
+        // Niveaux & Semestres
+        Route::resource('niveaux', \App\Http\Controllers\NiveauController::class);
+        Route::resource('semestres', \App\Http\Controllers\SemestreController::class);
+
+        // Salles, Types de séance, Classes, Cycles
+        Route::resource('salles', \App\Http\Controllers\SalleController::class);
+        Route::resource('typeseances', \App\Http\Controllers\TypeSeanceController::class);
+        Route::resource('classes', \App\Http\Controllers\ClasseController::class);
+        Route::resource('cycles', \App\Http\Controllers\CycleController::class);
 
         // Enseignants CRUD
-        Route::get('/enseignants', [\App\Http\Controllers\EnseignantController::class, 'index'])->name('enseignants.index');
-        Route::get('/enseignants/{enseignant}', [\App\Http\Controllers\EnseignantController::class, 'show'])->name('enseignants.show');
-        Route::get('/enseignants/{enseignant}/edit', [\App\Http\Controllers\EnseignantController::class, 'edit'])->name('enseignants.edit');
-        Route::put('/enseignants/{enseignant}', [\App\Http\Controllers\EnseignantController::class, 'update'])->name('enseignants.update');
-        Route::delete('/enseignants/{enseignant}', [\App\Http\Controllers\EnseignantController::class, 'destroy'])->name('enseignants.destroy');
+        Route::resource('enseignants', \App\Http\Controllers\EnseignantController::class)
+            ->only(['index','show','edit','update','destroy']);
         
         // Parametres
         Route::get('/parametres', [\App\Http\Controllers\ParametreController::class, 'parametreIndex'])->name('parametres.index');
 
     });
 
-    // Temporary route to test SMTP configuration (secured behind auth)
-    Route::get('/mail/test', [MailTestController::class, 'sendTest'])->name('mail.test');
-    // autres routes internes protégées :
-    // Route::get('/admin', [AdminController::class, 'index'])->name('admin');
-    // Route::resource('/posts', PostController::class);
+    // Fin des routes internes protégées
 });

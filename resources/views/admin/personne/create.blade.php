@@ -13,7 +13,7 @@
             </div>    
         @endif
 
-        <form action="{{ route('personne.submit') }}" method="post" class="mt-6">
+        <form action="{{ route('personnes.store') }}" method="post" class="mt-6">
             @csrf
             <div class="mb-4">
                 <label for="nom" class="block text-sm font-medium text-gray-700">Nom</label>

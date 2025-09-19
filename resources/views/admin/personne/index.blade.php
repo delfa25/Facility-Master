@@ -26,7 +26,7 @@
                         </select>
                         <button type="submit" class="px-3 py-2 bg-gray-800 text-white rounded">Filtrer</button>
                     </form>
-                    <a href="{{ route('personne') }}" class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600">Créer une personne</a>
+                    <a href="{{ route('personnes.create') }}" class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600">Créer une personne</a>
                 </div>
 
                 <div class="bg-white rounded-lg shadow">
