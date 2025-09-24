@@ -13,11 +13,11 @@
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <dt class="text-gray-500 text-sm">Nom complet</dt>
-                            <dd class="font-semibold">{{ $enseignant->personne->prenom ?? '' }} {{ $enseignant->personne->nom ?? '' }}</dd>
+                            <dd class="font-semibold">{{ $enseignant->prenom ?? '' }} {{ $enseignant->nom ?? '' }}</dd>
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Email</dt>
-                            <dd class="font-semibold">{{ $enseignant->personne->email ?? 'N/A' }}</dd>
+                            <dd class="font-semibold">{{ optional($enseignant->user)->email ?? 'N/A' }}</dd>
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Grade</dt>

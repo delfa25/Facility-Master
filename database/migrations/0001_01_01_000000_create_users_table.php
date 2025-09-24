@@ -13,10 +13,16 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('email')->unique();
+            $table->string('nom', 100)->nullable();
+            $table->string('prenom', 100)->nullable();
+            $table->string('phone', 30)->nullable();
+            $table->date('date_naissance')->nullable();
+            $table->string('lieu_naissance', 100)->nullable();
+            $table->string('adresse')->nullable();
             $table->string('password');
             $table->boolean('must_change_password')->default(false);
-            $table->enum('role', ['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT', 'INVITE'])->default('INVITE');
-            $table->foreignId('personne_id')->constrained('personne');
+            $table->enum('role', ['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT','INVITE','SUPERADMIN'])->default('INVITE');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('last_login')->nullable();
             $table->boolean('actif')->default(true);

@@ -68,7 +68,7 @@
                                     <option value="">--</option>
                                     @foreach($enseignants as $e)
                                         <option value="{{ $e->id }}" {{ old('responsable_enseignant_id', $classe->responsable_enseignant_id) == $e->id ? 'selected' : '' }}>
-                                            #{{ $e->id }} - {{ optional($e->personne)->prenom }} {{ optional($e->personne)->nom }}
+                                            #{{ $e->id }} - {{ $e->prenom ?? '' }} {{ $e->nom ?? '' }}
                                         </option>
                                     @endforeach
                                 </select>

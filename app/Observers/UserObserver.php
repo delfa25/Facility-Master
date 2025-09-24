@@ -14,11 +14,11 @@ class UserObserver
         // If the 'actif' flag was toggled to true, send the welcome email
         if ($user->wasChanged('actif') && $user->actif) {
             try {
-                $to = optional($user->personne)->email;
+                $to = $user->email;
                 if ($to) {
                     Mail::to($to)->send(new WelcomeMail($user));
                 } else {
-                    Log::warning('User activated but personne email missing', [
+                    Log::warning('User activated but email missing on related profile', [
                         'user_id' => $user->id,
                     ]);
                 }

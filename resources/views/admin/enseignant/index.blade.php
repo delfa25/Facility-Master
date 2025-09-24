@@ -33,6 +33,7 @@
                         <input type="text" name="statut" value="{{ $statut ?? '' }}" placeholder="Statut" class="p-2 border border-gray-300 rounded">
                         <button type="submit" class="px-3 py-2 bg-gray-800 text-white rounded">Filtrer</button>
                     </form>
+                    <a href="{{ route('enseignants.create') }}" class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600">Créer un enseignant</a>
                 </div>
 
                 <div class="bg-white rounded-lg shadow">
@@ -52,7 +53,7 @@
                                 @forelse($enseignants as $enseignant)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->id }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $enseignant->personne->prenom ?? '' }} {{ $enseignant->personne->nom ?? '' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $enseignant->prenom ?? '' }} {{ $enseignant->nom ?? '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->grade ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->specialite ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->statut ?? '-' }}</td>

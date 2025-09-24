@@ -13,7 +13,7 @@ class Document extends Model
 
     protected $fillable = [
         'type',
-        'personne_id',
+        'user_id',
         'etudiant_id',
         'numero',
         'date_emission',
@@ -29,9 +29,9 @@ class Document extends Model
         ];
     }
 
-    public function personne()
+    public function user()
     {
-        return $this->belongsTo(Personne::class);
+        return $this->belongsTo(User::class);
     }
 
     public function etudiant()

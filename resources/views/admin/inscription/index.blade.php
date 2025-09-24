@@ -54,7 +54,7 @@
                                 @forelse($inscriptions as $ins)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">
-                                            {{ optional($ins->etudiant->personne)->prenom }} {{ optional($ins->etudiant->personne)->nom }}
+                                            {{ optional($ins->etudiant)->prenom }} {{ optional($ins->etudiant)->nom }}
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $ins->etudiant->INE ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $ins->classe->libelle ?? ($ins->classe->code ?? ('Classe #'.$ins->classe_id)) }}</td>

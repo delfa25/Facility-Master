@@ -7,10 +7,13 @@
         <li class="nav-item"><a href="{{ route('etudiants.index') }}" class="block px-5 py-2 {{ request()->routeIs('etudiants.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Gestion des étudiants</a></li>
         <li class="nav-item"><a href="{{ route('enseignants.index') }}" class="block px-5 py-2 {{ request()->routeIs('enseignants.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Gestion des professeurs</a></li>
         <li class="nav-item"><a href="{{ route('users.index') }}" class="block px-5 py-2 {{ request()->routeIs('users.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Gestion des utilisateurs</a></li>
-        <li class="nav-item"><a href="{{ route('personnes.index') }}" class="block px-5 py-2 {{ request()->routeIs('personnes.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Gestion des personnes</a></li>
         <li class="nav-item"><a href="{{ route('parametres.index') }}" class="block px-5 py-2 {{ request()->routeIs('parametres.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Parametres</a></li>
         <li class="nav-item"><a href="{{ route('inscriptions.index') }}" class="block px-5 py-2 {{ request()->routeIs('inscriptions.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">Inscriptions</a></li>
         <li class="nav-item">
+        <a href="{{ route('roles.index') }}" class="block px-5 py-2 {{ request()->routeIs('roles.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">
+            Profils (rôles)
+        </a>
+        </li>
         <li class="nav-item">
         <li class="nav-item">
         <a href="{{ route('filieres.index') }}" class="block px-5 py-2 {{ request()->routeIs('filieres.*') ? 'bg-purple-700 text-white font-semibold rounded-md' : 'text-gray-800 hover:bg-gray-200 hover:text-black rounded-md' }}">

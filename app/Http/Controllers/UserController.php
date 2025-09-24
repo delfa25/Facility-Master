@@ -4,19 +4,97 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Etudiant;
+use App\Models\Enseignant;
+use App\Models\Personne;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function index(){
         // Récupérer les utilisateurs avec leurs relations
-        $users = User::with('personne')
-                    ->get();
+        $users = User::with(['etudiant','enseignant','personne'])->paginate(15);
 
-        return view('admin.user.index', compact('users'));
+        $roles = ['ETUDIANT','ENSEIGNANT','ADMINISTRATEUR'];
+        return view('admin.user.index', compact('users','roles'));
+    }
+
+    public function create()
+    {
+        $roles = ['ETUDIANT','ENSEIGNANT','ADMINISTRATEUR'];
+        return view('admin.user.create', compact('roles'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'role' => ['required', Rule::in(['ETUDIANT','ENSEIGNANT','ADMINISTRATEUR'])],
+            'email' => ['required','email','max:255','unique:users,email'],
+            'password' => ['required','min:6'],
+            'nom' => ['required','string','max:100'],
+            'prenom' => ['required','string','max:100'],
+            'phone' => ['nullable','string','max:30'],
+            'date_naissance' => ['nullable','date','before:today'],
+            'lieu_naissance' => ['nullable','string','max:100'],
+            'adresse' => ['nullable','string','max:255'],
+            // spécifiques
+            'INE' => ['nullable','string','max:13','unique:etudiant,INE'],
+            'date_inscription' => ['nullable','date'],
+            'statut_etudiant' => ['nullable', Rule::in(['INACTIF','ACTIF','SUSPENDU','DIPLOME'])],
+            'grade' => ['nullable','string','max:50'],
+            'specialite' => ['nullable','string','max:100'],
+            'statut_enseignant' => ['nullable', Rule::in(['INACTIF','SUSPENDU','ACTIF'])],
+            'bureau' => ['nullable','string','max:100'],
+        ]);
+
+        $user = User::create([
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'phone' => $request->phone,
+            'date_naissance' => $request->date_naissance,
+            'lieu_naissance' => $request->lieu_naissance,
+            'adresse' => $request->adresse,
+            'actif' => true,
+            'must_change_password' => true,
+        ]);
+
+        if (method_exists($user, 'syncRoles')) {
+            $user->syncRoles([$request->role]);
+        }
+
+        switch ($request->role) {
+            case 'ETUDIANT':
+                Etudiant::create([
+                    'user_id' => $user->id,
+                    'INE' => $request->INE,
+                    'date_inscription' => $request->date_inscription,
+                    'statut' => $request->statut_etudiant ?: 'INACTIF',
+                ]);
+                break;
+            case 'ENSEIGNANT':
+                Enseignant::create([
+                    'user_id' => $user->id,
+                    'grade' => $request->grade,
+                    'specialite' => $request->specialite,
+                    'statut' => $request->statut_enseignant ?: 'INACTIF',
+                ]);
+                break;
+            case 'ADMINISTRATEUR':
+                Personne::create([
+                    'user_id' => $user->id,
+                    'bureau' => $request->bureau,
+                ]);
+                break;
+        }
+
+        return redirect()->route('users.show', $user)->with('success', 'Utilisateur créé avec succès.');
     }
 
     public function destroy(User $user)
@@ -27,54 +105,99 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['personne','personne.etudiant']);
+        $user->load(['etudiant','enseignant']);
         return view('admin.user.show', compact('user'));
     }
 
     public function edit(User $user)
     {
-        $user->load('personne');
-        $roles = ['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT','INVITE'];
+        $user->load(['etudiant','enseignant','personne']);
+        $roles = ['ETUDIANT','ENSEIGNANT','ADMINISTRATEUR'];
         return view('admin.user.edit', compact('user','roles'));
     }
 
     public function update(Request $request, User $user)
     {
-        $user->load('personne');
-
         $request->validate([
-            'nom' => 'required|string|max:100',
-            'prenom' => 'required|string|max:100',
-            'date_naissance' => 'required|date|before:today',
-            'lieu_naissance' => 'required|string|max:100',
-            'email' => [
-                'required','email','max:255',
-                Rule::unique('personne', 'email')->ignore($user->personne->id ?? null),
-            ],
-            'phone' => 'required|string|max:30',
-            'role' => ['required', Rule::in(['ADMINISTRATEUR','ENSEIGNANT','ETUDIANT','INVITE'])],
-            'actif' => 'nullable|boolean',
-            'must_change_password' => 'nullable|boolean',
+            'role' => ['required', Rule::in(['ETUDIANT','ENSEIGNANT','ADMINISTRATEUR'])],
+            'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
+            'password' => ['nullable','min:6'],
+            'nom' => ['required','string','max:100'],
+            'prenom' => ['required','string','max:100'],
+            'phone' => ['nullable','string','max:30'],
+            'date_naissance' => ['nullable','date','before:today'],
+            'lieu_naissance' => ['nullable','string','max:100'],
+            'adresse' => ['nullable','string','max:255'],
+            // spécifiques
+            'INE' => ['nullable','string','max:13', Rule::unique('etudiant','INE')->ignore(optional($user->etudiant)->id)],
+            'date_inscription' => ['nullable','date'],
+            'statut_etudiant' => ['nullable', Rule::in(['INACTIF','ACTIF','SUSPENDU','DIPLOME'])],
+            'grade' => ['nullable','string','max:50'],
+            'specialite' => ['nullable','string','max:100'],
+            'statut_enseignant' => ['nullable', Rule::in(['INACTIF','SUSPENDU','ACTIF'])],
+            'bureau' => ['nullable','string','max:100'],
         ]);
 
-        // Update personne
-        if ($user->personne) {
-            $user->personne->update([
-                'nom' => $request->nom,
-                'prenom' => $request->prenom,
-                'date_naissance' => $request->date_naissance,
-                'lieu_naissance' => $request->lieu_naissance,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'role' => $request->role,
-            ]);
+        $user->fill([
+            'email' => $request->email,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'phone' => $request->phone,
+            'date_naissance' => $request->date_naissance,
+            'lieu_naissance' => $request->lieu_naissance,
+            'adresse' => $request->adresse,
+            'role' => $request->role,
+            'actif' => (bool) $request->boolean('actif', $user->actif),
+            'must_change_password' => (bool) $request->boolean('must_change_password', $user->must_change_password),
+        ]);
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+            $user->must_change_password = true;
+        }
+        $user->save();
+
+        if (method_exists($user, 'syncRoles')) {
+            $user->syncRoles([$request->role]);
         }
 
-        // Update user flags
-        $user->update([
-            'actif' => (bool) $request->boolean('actif'),
-            'must_change_password' => (bool) $request->boolean('must_change_password'),
-        ]);
+        switch ($request->role) {
+            case 'ETUDIANT':
+                $et = $user->etudiant ?: new Etudiant(['user_id' => $user->id]);
+                $et->fill([
+                    'INE' => $request->INE,
+                    'date_inscription' => $request->date_inscription,
+                    'statut' => $request->statut_etudiant ?: $et->statut,
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'date_naissance' => $request->date_naissance,
+                    'lieu_naissance' => $request->lieu_naissance,
+                    'phone' => $request->phone,
+                ]);
+                $et->user_id = $user->id;
+                $et->save();
+                break;
+            case 'ENSEIGNANT':
+                $ens = $user->enseignant ?: new Enseignant(['user_id' => $user->id]);
+                $ens->fill([
+                    'grade' => $request->grade,
+                    'specialite' => $request->specialite,
+                    'statut' => $request->statut_enseignant ?: $ens->statut,
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'date_naissance' => $request->date_naissance,
+                    'lieu_naissance' => $request->lieu_naissance,
+                    'phone' => $request->phone,
+                ]);
+                $ens->user_id = $user->id;
+                $ens->save();
+                break;
+            case 'ADMINISTRATEUR':
+                $pers = $user->personne ?: new Personne(['user_id' => $user->id]);
+                $pers->fill(['bureau' => $request->bureau]);
+                $pers->user_id = $user->id;
+                $pers->save();
+                break;
+        }
 
         return redirect()->route('users.show', $user)->with('success', 'Utilisateur mis à jour avec succès.');
     }

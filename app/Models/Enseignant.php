@@ -12,18 +12,16 @@ class Enseignant extends Model
     protected $table = 'enseignant';
 
     protected $fillable = [
-        'personne_id',
+        'user_id',
         'grade',
         'specialite',
         'statut',
     ];
 
-    /**
-     * Relation avec Personne
-     */
-    public function personne()
+    /** Relation vers l'utilisateur lié */
+    public function user()
     {
-        return $this->belongsTo(Personne::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -53,6 +51,7 @@ class Enseignant extends Model
     /**
      * Relation avec les devoirs publiés
      */
+    // No personal casts here; personal fields live on users
     public function devoirs()
     {
         return $this->hasMany(Devoir::class);
@@ -75,18 +74,12 @@ class Enseignant extends Model
     }
 
     /**
-     * Accessor pour le nom complet via la personne
+     * Accessor pour le nom complet
      */
     public function getNomCompletAttribute()
     {
-        return $this->personne ? $this->personne->nom_complet : null;
+        return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
     }
 
-    /**
-     * Accessor pour l'email via la personne
-     */
-    public function getEmailAttribute()
-    {
-        return $this->personne ? $this->personne->email : null;
-    }
+    // L'email est stocké sur le modèle User (relation user)
 }

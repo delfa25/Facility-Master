@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -17,11 +18,18 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'nom',
+        'prenom',
+        'email',
+        'phone',
+        'date_naissance',
+        'lieu_naissance',
+        'adresse',
         'password',
-        'personne_id',
+        'must_change_password',
+        'role',
         'last_login',
         'actif',
-        'must_change_password',
     ];
 
     /**
@@ -50,49 +58,57 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Relation avec la table personne
-     */
+    /** Relation vers un profil étudiant (s'il existe) */
+    public function etudiant()
+    {
+        return $this->hasOne(Etudiant::class);
+    }
+
+    /** Relation vers un profil enseignant (s'il existe) */
+    public function enseignant()
+    {
+        return $this->hasOne(Enseignant::class);
+    }
+
+    /** Relation vers un profil personne (admin) */
     public function personne()
     {
-        return $this->belongsTo(Personne::class);
+        return $this->hasOne(Personne::class);
     }
 
-    /**
-     * Accessor pour récupérer l'email depuis la table personne
-     */
-    public function getEmailAttribute()
-    {
-        return $this->personne->email ?? null;
-    }
+    // Email est stocké directement sur la table users
 
     /**
-     * Accessor pour récupérer le nom depuis la table personne
+     * Accessor pour récupérer le nom complet depuis etudiant/enseignant
      */
     public function getNameAttribute()
     {
-        return $this->personne ? $this->personne->nom . ' ' . $this->personne->prenom : null;
+        return $this->username;
     }
 
-    /**
-     * Accessor pour récupérer le rôle depuis la table personne
-     */
-    public function getRoleAttribute()
+    /** Nom d'affichage priorisant les profils, puis fallback sur users.nom/prenom */
+    public function getUsernameAttribute(): ?string
     {
-        // Primary source: personne.role
+        if ($this->relationLoaded('etudiant') && $this->etudiant) {
+            return trim(($this->etudiant->nom ?? '') . ' ' . ($this->etudiant->prenom ?? '')) ?: null;
+        }
+        if ($this->relationLoaded('enseignant') && $this->enseignant) {
+            return trim(($this->enseignant->nom ?? '') . ' ' . ($this->enseignant->prenom ?? '')) ?: null;
+        }
         if ($this->relationLoaded('personne') && $this->personne) {
-            return $this->personne->role;
+            return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
         }
-
-        // Lazy-load personne if not loaded
-        if ($this->personne) {
-            return $this->personne->role;
+        // Lazy fallback
+        if ($this->etudiant) {
+            return trim(($this->etudiant->nom ?? '') . ' ' . ($this->etudiant->prenom ?? '')) ?: null;
         }
-
-        // Fallback for legacy schema where users.role still exists (pre-migration)
-        $attributes = $this->getAttributes();
-        return $attributes['role'] ?? null;
+        if ($this->enseignant) {
+            return trim(($this->enseignant->nom ?? '') . ' ' . ($this->enseignant->prenom ?? '')) ?: null;
+        }
+        return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
     }
+
+    // role attribute is stored on users table directly
 
     /**
      * Get the name of the unique identifier for the user.
@@ -111,9 +127,7 @@ class User extends Authenticatable
      */
     public static function findByEmail($email)
     {
-        return static::whereHas('personne', function($query) use ($email) {
-            $query->where('email', $email);
-        })->first();
+        return static::where('email', $email)->first();
     }
 
     /**
@@ -134,7 +148,7 @@ class User extends Authenticatable
      */
     public function findForPassport($username)
     {
-        return $this->findByEmail($username);
+        return static::where('email', $username)->first();
     }
 
     /**

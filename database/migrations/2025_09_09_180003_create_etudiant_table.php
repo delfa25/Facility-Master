@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('etudiant', function (Blueprint $table) {
             $table->id();
             $table->string('INE', 13)->unique();
-            $table->foreignId('personne_id')->constrained('personne');
+            $table->foreignId('user_id')->constrained('users');
             $table->date('date_inscription')->nullable();
             $table->enum('statut', ['INACTIF','ACTIF','SUSPENDU','DIPLOME'])->default('INACTIF');
             $table->timestamps();

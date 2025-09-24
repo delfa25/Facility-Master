@@ -31,7 +31,7 @@ class RoleMiddleware
             return $next($request);
         }
 
-        // User model exposes accessor getRoleAttribute() reading personne->role
+        // User model exposes 'role' directly (stored on users table)
         $userRole = $user->role;
 
         if ($userRole === null || !in_array($userRole, $roles, true)) {

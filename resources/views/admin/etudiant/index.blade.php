@@ -40,6 +40,7 @@
                         </select>
                         <button type="submit" class="px-3 py-2 bg-gray-800 text-white rounded">Filtrer</button>
                     </form>
+                    <a href="{{ route('etudiants.create') }}" class="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600">Créer un étudiant</a>
                 </div>
 
                 <div class="bg-white rounded-lg shadow">
@@ -60,7 +61,7 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $etudiant->id }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $etudiant->INE }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $etudiant->personne->prenom ?? '' }} {{ $etudiant->personne->nom ?? '' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ optional($etudiant->user)->prenom ?? '' }} {{ optional($etudiant->user)->nom ?? '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                 @if($etudiant->statut === 'ACTIF') bg-green-100 text-green-800 

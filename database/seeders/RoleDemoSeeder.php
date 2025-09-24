@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Personne;
 use App\Models\User;
 use App\Models\Etudiant;
 use App\Models\Enseignant;
+use App\Models\Personne;
 
 class RoleDemoSeeder extends Seeder
 {
@@ -15,101 +15,93 @@ class RoleDemoSeeder extends Seeder
     {
         $datasets = [
             [
-                'personne' => [
-                    'nom' => 'Admin',
-                    'prenom' => 'System',
-                    'date_naissance' => now()->subYears(30)->toDateString(),
-                    'lieu_naissance' => 'Ouaga',
-                    'email' => 'admin@example.com',
-                    'phone' => '+22670000000',
-                    'role' => 'ADMINISTRATEUR',
-                ],
-                'user' => [
-                    'password' => 'admin123',
-                ],
+                'role' => 'ADMINISTRATEUR',
+                'email' => 'admin@example.com',
+                'password' => 'admin123',
             ],
             [
-                'personne' => [
+                'role' => 'ENSEIGNANT',
+                'email' => 'enseignant@example.com',
+                'password' => 'enseignant123',
+                'enseignant' => [
                     'nom' => 'Prof',
                     'prenom' => 'Alpha',
                     'date_naissance' => now()->subYears(35)->toDateString(),
                     'lieu_naissance' => 'Dakar',
-                    'email' => 'enseignant@example.com',
                     'phone' => '+221700000002',
-                    'role' => 'ENSEIGNANT',
-                ],
-                'user' => [
-                    'password' => 'enseignant123',
+                    'grade' => null,
+                    'specialite' => null,
+                    'statut' => 'INACTIF',
                 ],
             ],
             [
-                'personne' => [
+                'role' => 'ETUDIANT',
+                'email' => 'etudiant@example.com',
+                'password' => 'etudiant123',
+                'etudiant' => [
+                    'INE' => null, // will be generated
                     'nom' => 'Etudiant',
                     'prenom' => 'Beta',
                     'date_naissance' => now()->subYears(20)->toDateString(),
                     'lieu_naissance' => 'Dakar',
-                    'email' => 'etudiant@example.com',
                     'phone' => '+221700000003',
-                    'role' => 'ETUDIANT',
-                ],
-                'user' => [
-                    'password' => 'etudiant123',
+                    'date_inscription' => null,
+                    'statut' => 'INACTIF',
                 ],
             ],
             [
-                'personne' => [
-                    'nom' => 'Invite',
-                    'prenom' => 'Gamma',
-                    'date_naissance' => now()->subYears(28)->toDateString(),
-                    'lieu_naissance' => 'Dakar',
-                    'email' => 'invite@example.com',
-                    'phone' => '+221700000004',
-                    'role' => 'INVITE',
-                ],
-                'user' => [
-                    'password' => 'invite123',
-                ],
+                'role' => 'INVITE',
+                'email' => 'invite@example.com',
+                'password' => 'invite123',
             ],
         ];
 
         foreach ($datasets as $data) {
-            // Skip if email already exists
-            $existing = Personne::where('email', $data['personne']['email'])->first();
+            // Skip if a user with same email already exists
+            $existing = User::where('email', $data['email'])->first();
             if ($existing) {
                 continue;
             }
 
-            $personne = Personne::create($data['personne']);
-
-            $isAdmin = $personne->role === 'ADMINISTRATEUR';
+            $isAdmin = ($data['role'] === 'ADMINISTRATEUR');
             $user = User::create([
-                'password' => Hash::make($data['user']['password']),
-                'personne_id' => $personne->id,
-                // Seul l'admin est actif par défaut, les autres restent inactifs
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => $data['role'],
                 'actif' => $isAdmin,
                 'must_change_password' => true,
             ]);
 
+            // assign spatie role
+            if (method_exists($user, 'assignRole')) {
+                $user->assignRole($data['role']);
+            }
+
             // Auto-create role specific records
-            switch ($personne->role) {
+            switch ($data['role']) {
                 case 'ETUDIANT':
+                    $et = $data['etudiant'] ?? [];
                     Etudiant::create([
-                        'INE' => generateIne(),
-                        'personne_id' => $personne->id,
-                        'date_inscription' => null,
-                        'statut' => 'INACTIF',
+                        'INE' => $et['INE'] ?: generateIne(),
+                        'user_id' => $user->id,
+                        'date_inscription' => $et['date_inscription'] ?? null,
+                        'statut' => $et['statut'] ?? 'INACTIF',
                     ]);
                     break;
                 case 'ENSEIGNANT':
+                    $ens = $data['enseignant'] ?? [];
                     Enseignant::create([
-                        'personne_id' => $personne->id,
-                        'grade' => null,
-                        'specialite' => null,
-                        'statut' => 'INACTIF',
+                        'user_id' => $user->id,
+                        'grade' => $ens['grade'] ?? null,
+                        'specialite' => $ens['specialite'] ?? null,
+                        'statut' => $ens['statut'] ?? 'INACTIF',
                     ]);
                     break;
                 default:
-                    // nothing
+                    // admins: attach personne profile for completeness
+                    if ($data['role'] === 'ADMINISTRATEUR') {
+                        Personne::firstOrCreate(['user_id' => $user->id], ['bureau' => 'A101']);
+                    }
                     break;
             }
         }

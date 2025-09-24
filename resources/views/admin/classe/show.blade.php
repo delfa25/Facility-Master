@@ -37,7 +37,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <dt class="text-gray-500 text-sm">Responsable</dt>
-                            <dd class="font-semibold">{{ optional(optional($classe->responsableEnseignant)->personne)->prenom }} {{ optional(optional($classe->responsableEnseignant)->personne)->nom }}</dd>
+                            <dd class="font-semibold">{{ optional($classe->responsableEnseignant)->prenom }} {{ optional($classe->responsableEnseignant)->nom }}</dd>
                         </div>
                     </dl>
 

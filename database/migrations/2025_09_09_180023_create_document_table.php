@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('document', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['ATTESTATION','DIPLOME','AUTRE']);
-            $table->foreignId('personne_id')->constrained('personne');
+            $table->foreignId('user_id')->constrained('users');
             $table->foreignId('etudiant_id')->constrained('etudiant');
             $table->string('numero', 100);
             $table->date('date_emission');

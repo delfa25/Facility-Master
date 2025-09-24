@@ -16,7 +16,7 @@ class ClasseController extends Controller
     public function index(Request $request)
     {
         $q = trim((string) $request->get('q', ''));
-        $query = Classe::with(['filiere','niveau','salle','anneeAcad','responsableEnseignant.personne']);
+        $query = Classe::with(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
         if ($q !== '') {
             $query->where('code', 'like', "%{$q}%")
                   ->orWhere('nom', 'like', "%{$q}%")
@@ -33,7 +33,7 @@ class ClasseController extends Controller
         $niveaux = Niveau::ordered()->get();
         $salles  = Salle::orderBy('code')->get();
         $annees  = AnneeAcad::orderByDesc('date_debut')->get();
-        $enseignants = Enseignant::with('personne')->orderBy('id','desc')->get();
+        $enseignants = Enseignant::orderBy('id','desc')->get();
         return view('admin.classe.create', compact('filieres','niveaux','salles','annees','enseignants'));
     }
 
@@ -55,18 +55,18 @@ class ClasseController extends Controller
 
     public function show(Classe $classe)
     {
-        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant.personne']);
+        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
         return view('admin.classe.show', compact('classe'));
     }
 
     public function edit(Classe $classe)
     {
-        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant.personne']);
+        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
         $filieres = Filiere::orderBy('nom')->get();
         $niveaux = Niveau::ordered()->get();
         $salles  = Salle::orderBy('code')->get();
         $annees  = AnneeAcad::orderByDesc('date_debut')->get();
-        $enseignants = Enseignant::with('personne')->orderBy('id','desc')->get();
+        $enseignants = Enseignant::orderBy('id','desc')->get();
         return view('admin.classe.edit', compact('classe','filieres','niveaux','salles','annees','enseignants'));
     }
 

@@ -20,7 +20,7 @@ class InscriptionController extends Controller
         $anneeId = $request->get('annee_id');
         $q = trim((string) $request->get('q', ''));
 
-        $query = Inscription::with(['etudiant.personne','classe','anneeAcad']);
+        $query = Inscription::with(['etudiant','classe','anneeAcad']);
 
         if ($etudiantId) {
             $query->where('etudiant_id', $etudiantId);
@@ -32,10 +32,11 @@ class InscriptionController extends Controller
             $query->where('annee_id', $anneeId);
         }
         if ($q !== '') {
-            $query->whereHas('etudiant.personne', function($sub) use ($q) {
+            $query->whereHas('etudiant', function($sub) use ($q) {
                 $sub->where('nom', 'like', "%{$q}%")
-                    ->orWhere('prenom', 'like', "%{$q}%")
-                    ->orWhere('email', 'like', "%{$q}%");
+                    ->orWhere('prenom', 'like', "%{$q}%");
+            })->orWhereHas('etudiant.user', function($sub) use ($q) {
+                $sub->where('email', 'like', "%{$q}%");
             })->orWhereHas('classe', function($sub) use ($q) {
                 $sub->where('libelle', 'like', "%{$q}%")
                     ->orWhere('code', 'like', "%{$q}%");
@@ -55,7 +56,7 @@ class InscriptionController extends Controller
     public function create(Request $request)
     {
         $etudiantId = (int) $request->get('etudiant');
-        $etudiant = Etudiant::with('personne')->findOrFail($etudiantId);
+        $etudiant = Etudiant::findOrFail($etudiantId);
 
         if ($etudiant->statut === 'DIPLOME') {
             return redirect()->route('etudiants.show', $etudiant)

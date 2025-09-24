@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Personne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,7 +49,19 @@ class AuthController extends Controller
                 return redirect()->route('password.edit');
             }
 
-            return redirect()->intended('/dashboard');
+            // Redirection par rôle
+            switch ($user->role) {
+                case 'ETUDIANT':
+                    return redirect()->intended('/student/dashboard');
+                case 'ENSEIGNANT':
+                    return redirect()->intended('/teacher/dashboard');
+                case 'ADMINISTRATEUR':
+                    return redirect()->intended('/admin/dashboard');
+                case 'SUPERADMIN':
+                    return redirect()->intended('/superadmin/dashboard');
+                default:
+                    return redirect()->intended('/dashboard');
+            }
         }
 
         return back()->withErrors([

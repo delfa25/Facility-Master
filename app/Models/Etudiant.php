@@ -13,7 +13,7 @@ class Etudiant extends Model
 
     protected $fillable = [
         'INE',
-        'personne_id',
+        'user_id',
         'date_inscription',
         'statut',
     ];
@@ -25,12 +25,10 @@ class Etudiant extends Model
         ];
     }
 
-    /**
-     * Relation avec Personne
-     */
-    public function personne()
+    /** Relation vers l'utilisateur lié */
+    public function user()
     {
-        return $this->belongsTo(Personne::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -76,11 +74,11 @@ class Etudiant extends Model
     }
 
     /**
-     * Accessor pour le nom complet via la personne
+     * Accessor pour le nom complet
      */
     public function getNomCompletAttribute()
     {
-        return $this->personne ? $this->personne->nom_complet : null;
+        return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
     }
 
     /**

@@ -17,7 +17,7 @@
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Nom complet</dt>
-                            <dd class="font-semibold">{{ $etudiant->personne->prenom ?? '' }} {{ $etudiant->personne->nom ?? '' }}</dd>
+                            <dd class="font-semibold">{{ optional($etudiant->user)->prenom ?? '' }} {{ optional($etudiant->user)->nom ?? '' }}</dd>
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Statut</dt>

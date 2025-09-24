@@ -8,7 +8,7 @@
         @include('partials.navbar')
         <main class="flex-1 p-6 items-center overflow-auto">
             <div class="max-w-3xl ml-[250px]">
-                <h1 class="text-2xl font-bold mb-6">Inscrire l'étudiant {{ $etudiant->personne->prenom ?? '' }} {{ $etudiant->personne->nom ?? '' }} (INE {{ $etudiant->INE }})</h1>
+                <h1 class="text-2xl font-bold mb-6">Inscrire l'étudiant {{ $etudiant->prenom ?? '' }} {{ $etudiant->nom ?? '' }} (INE {{ $etudiant->INE }})</h1>
                 <div class="bg-white rounded-lg shadow p-6">
                     <form action="{{ route('inscriptions.store') }}" method="POST" class="space-y-6">
                         @csrf

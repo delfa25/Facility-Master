@@ -3,10 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enseignant;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class EnseignantController extends Controller
 {
+    public function create()
+    {
+        return view('admin.enseignant.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nom' => ['required','string','max:100'],
+            'prenom' => ['required','string','max:100'],
+            'date_naissance' => ['required','date','before:today'],
+            'lieu_naissance' => ['required','string','max:100'],
+            'email' => ['required','email','max:255','unique:users,email'],
+            'phone' => ['required','string','max:30'],
+            'grade' => ['nullable','string','max:50'],
+            'specialite' => ['nullable','string','max:100'],
+        ]);
+
+        $enseignant = DB::transaction(function() use ($request) {
+            // Create inactive user with role ENSEIGNANT
+            $user = User::create([
+                'email' => $request->email,
+                'password' => Hash::make('facilitypass'),
+                'role' => 'ENSEIGNANT',
+                'actif' => false,
+                'must_change_password' => true,
+            ]);
+
+            return Enseignant::create([
+                'user_id' => $user->id,
+                'nom' => $request->nom,
+                'prenom' => $request->prenom,
+                'date_naissance' => $request->date_naissance,
+                'lieu_naissance' => $request->lieu_naissance,
+                'phone' => $request->phone,
+                'grade' => $request->grade,
+                'specialite' => $request->specialite,
+                'statut' => 'INACTIF',
+            ]);
+        });
+
+        return redirect()->route('enseignants.show', $enseignant)->with('success', 'Enseignant créé. Le compte utilisateur est en attente d\'activation.');
+    }
     public function index(\Illuminate\Http\Request $request)
     {
         $q = trim($request->get('q', ''));
@@ -14,9 +60,9 @@ class EnseignantController extends Controller
         $specialite = $request->get('specialite');
         $statut = $request->get('statut');
 
-        $query = Enseignant::with('personne');
+        $query = Enseignant::query();
         if ($q !== '') {
-            $query->whereHas('personne', function($sub) use ($q) {
+            $query->where(function($sub) use ($q) {
                 $sub->where('nom', 'like', "%{$q}%")
                     ->orWhere('prenom', 'like', "%{$q}%")
                     ->orWhere('email', 'like', "%{$q}%");
@@ -44,13 +90,11 @@ class EnseignantController extends Controller
 
     public function show(Enseignant $enseignant)
     {
-        $enseignant->load('personne');
         return view('admin.enseignant.show', compact('enseignant'));
     }
 
     public function edit(Enseignant $enseignant)
     {
-        $enseignant->load('personne');
         return view('admin.enseignant.edit', compact('enseignant'));
     }
 
