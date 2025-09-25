@@ -89,23 +89,33 @@ class User extends Authenticatable
     /** Nom d'affichage priorisant les profils, puis fallback sur users.nom/prenom */
     public function getUsernameAttribute(): ?string
     {
-        if ($this->relationLoaded('etudiant') && $this->etudiant) {
-            return trim(($this->etudiant->nom ?? '') . ' ' . ($this->etudiant->prenom ?? '')) ?: null;
+        // Try Etudiant profile if loaded or available
+        if (($this->relationLoaded('etudiant') && $this->etudiant) || $this->etudiant) {
+            $full = trim(($this->etudiant->nom ?? '') . ' ' . ($this->etudiant->prenom ?? ''));
+            if ($full !== '') {
+                return $full;
+            }
         }
-        if ($this->relationLoaded('enseignant') && $this->enseignant) {
-            return trim(($this->enseignant->nom ?? '') . ' ' . ($this->enseignant->prenom ?? '')) ?: null;
+
+        // Try Enseignant profile if loaded or available
+        if (($this->relationLoaded('enseignant') && $this->enseignant) || $this->enseignant) {
+            $full = trim(($this->enseignant->nom ?? '') . ' ' . ($this->enseignant->prenom ?? ''));
+            if ($full !== '') {
+                return $full;
+            }
         }
-        if ($this->relationLoaded('personne') && $this->personne) {
-            return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
+
+        // If a Personne relation exists, we still rely on users.nom/prenom for now
+        if (($this->relationLoaded('personne') && $this->personne) || $this->personne) {
+            $full = trim(($this->nom ?? '') . ' ' . ($this->prenom ?? ''));
+            if ($full !== '') {
+                return $full;
+            }
         }
-        // Lazy fallback
-        if ($this->etudiant) {
-            return trim(($this->etudiant->nom ?? '') . ' ' . ($this->etudiant->prenom ?? '')) ?: null;
-        }
-        if ($this->enseignant) {
-            return trim(($this->enseignant->nom ?? '') . ' ' . ($this->enseignant->prenom ?? '')) ?: null;
-        }
-        return trim(($this->nom ?? '') . ' ' . ($this->prenom ?? '')) ?: null;
+
+        // Final fallback to fields on users table
+        $fallback = trim(($this->nom ?? '') . ' ' . ($this->prenom ?? ''));
+        return $fallback !== '' ? $fallback : null;
     }
 
     // role attribute is stored on users table directly
@@ -129,6 +139,8 @@ class User extends Authenticatable
     {
         return static::where('email', $email)->first();
     }
+
+    // Deleting a User will cascade to related profiles via DB foreign keys
 
     /**
      * Get the password for the user.

@@ -15,6 +15,13 @@
         <main class="flex-1 p-6 items-center overflow-auto">
             <div class="max-w-6xl ml-[250px]">
                 <h1 class="text-2xl font-bold mb-6 text-center">Liste des utilisateurs</h1>
+                @role('SUPERADMIN')
+                <div class="mb-4 flex justify-end">
+                    <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-500">
+                        + Nouvel utilisateur
+                    </a>
+                </div>
+                @endrole
                 <!-- Tableau principal -->
                 <div class="bg-white rounded-lg shadow">
                     <div class="overflow-x-auto">

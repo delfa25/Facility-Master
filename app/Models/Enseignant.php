@@ -82,4 +82,17 @@ class Enseignant extends Model
     }
 
     // L'email est stocké sur le modèle User (relation user)
+
+    /**
+     * When an Enseignant profile is deleted, also delete the linked User
+     * to keep data consistent (reverse cascade).
+     */
+    protected static function booted()
+    {
+        static::deleting(function (Enseignant $enseignant) {
+            if ($enseignant->user) {
+                $enseignant->user->delete();
+            }
+        });
+    }
 }

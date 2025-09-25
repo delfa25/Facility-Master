@@ -17,7 +17,7 @@
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Année académique</dt>
-                            <dd class="font-semibold">{{ optional($semestre->anneeAcad)->code }}</dd>
+                            <dd class="font-semibold">{{ optional($semestre->academicYear)->name }}</dd>
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Date début</dt>

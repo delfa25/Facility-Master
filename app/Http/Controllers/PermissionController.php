@@ -12,9 +12,14 @@ class PermissionController extends Controller
      */
     public function index(Request $request)
     {
-        $permissions = Permission::all();
+        $q = $request->string('q')->toString();
+        $query = Permission::query();
+        if ($q !== '') {
+            $query->where('name', 'like', "%{$q}%");
+        }
+        $permissions = $query->orderBy('name')->paginate(10)->withQueryString();
 
-        return view('permissions.index');
+        return view('admin.permission.index', compact('permissions', 'q'));
     }
 
     /**
@@ -22,7 +27,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        return view('permissions.create');
+        return view('admin.permission.create');
     }
 
     /**
@@ -34,39 +39,44 @@ class PermissionController extends Controller
             'name' => 'required|string|max:255|unique:permissions,name',
         ]);
 
-        $permissions = Permission::create(['name' => $request->name]);
-        return redirect()->route('permissions.index', $permissions)->with('success', 'Permission créée avec succès.');
+        $permission = Permission::create(['name' => $request->name]);
+        return redirect()->route('permissions.index')->with('success', 'Permission créée avec succès.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Permission $permissions)
+    public function show(Permission $permission)
     {
-        return view('permissions.show', compact('permissions'));
+        return view('admin.permission.show', compact('permission'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Permission $permissions)
+    public function edit(Permission $permission)
     {
-        //
+        return view('admin.permission.edit', compact('permission'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Permission $permissions)
+    public function update(Request $request, Permission $permission)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:permissions,name,' . $permission->id,
+        ]);
+        $permission->update(['name' => $request->name]);
+        return redirect()->route('permissions.index')->with('success', 'Permission mise à jour.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Permission $permissions)
+    public function destroy(Permission $permission)
     {
-        //
+        $permission->delete();
+        return redirect()->route('permissions.index')->with('success', 'Permission supprimée.');
     }
 }

@@ -33,9 +33,9 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $permission->name }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <div class="flex space-x-2">
-                                                <a class="text-blue-600 hover:text-blue-900" href="{{ route('permissions.show', $permissions) }}">Voir</a>
-                                                <a class="text-green-600 hover:text-green-900" href="{{ route('permissions.edit', $permissions) }}">Modifier</a>
-                                                <form action="{{ route('permissions.destroy', $permissions) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ce profil ?')">
+                                                <a class="text-blue-600 hover:text-blue-900" href="{{ route('permissions.show', $permission) }}">Voir</a>
+                                                <a class="text-green-600 hover:text-green-900" href="{{ route('permissions.edit', $permission) }}">Modifier</a>
+                                                <form action="{{ route('permissions.destroy', $permission) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer cette permission ?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">Supprimer</button>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4">{{ $permission->links() }}</div>
+                <div class="mt-4">{{ $permissions->links() }}</div>
             </div>
         </main>
     </div>

@@ -62,13 +62,15 @@ class EtudiantController extends Controller
         $q = trim($request->get('q', ''));
         $statut = $request->get('statut');
 
-        $query = Etudiant::query();
+        $query = Etudiant::query()->with('user')->whereHas('user');
         if ($q !== '') {
             $query->where(function($sub) use ($q) {
-                $sub->where('nom', 'like', "%{$q}%")
-                    ->orWhere('prenom', 'like', "%{$q}%")
-                    ->orWhere('email', 'like', "%{$q}%")
-                    ->orWhere('INE', 'like', "%{$q}%");
+                $sub->where('INE', 'like', "%{$q}%")
+                    ->orWhereHas('user', function($u) use ($q) {
+                        $u->where('nom', 'like', "%{$q}%")
+                          ->orWhere('prenom', 'like', "%{$q}%")
+                          ->orWhere('email', 'like', "%{$q}%");
+                    });
             });
         }
         if ($statut && in_array($statut, ['INACTIF','ACTIF','SUSPENDU','DIPLOME'], true)) {
@@ -89,7 +91,7 @@ class EtudiantController extends Controller
 
     public function show(Etudiant $etudiant)
     {
-        $etudiant->load(['inscriptions.classe','inscriptions.anneeAcad']);
+        $etudiant->load(['inscriptions.classe','inscriptions.academicYear']);
         return view('admin.etudiant.show', compact('etudiant'));
     }
 
@@ -109,7 +111,7 @@ class EtudiantController extends Controller
             'lieu_naissance' => ['required','string','max:100'],
             'email' => [
                 'required','email','max:255',
-                Rule::unique('etudiant', 'email')->ignore($etudiant->id),
+                Rule::unique('users', 'email')->ignore($etudiant->user_id),
             ],
             'phone' => ['required','string','max:30'],
             'INE' => [
@@ -121,15 +123,20 @@ class EtudiantController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $etudiant) {
-            // Update Etudiant
+            // Update User (identity/contact fields)
+            if ($etudiant->user) {
+                $etudiant->user->update([
+                    'nom' => $request->nom,
+                    'prenom' => $request->prenom,
+                    'date_naissance' => $request->date_naissance,
+                    'lieu_naissance' => $request->lieu_naissance,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                ]);
+            }
+            // Update Etudiant (academic fields only)
             $etudiant->update([
                 'INE' => $request->INE,
-                'nom' => $request->nom,
-                'prenom' => $request->prenom,
-                'date_naissance' => $request->date_naissance,
-                'lieu_naissance' => $request->lieu_naissance,
-                'email' => $request->email,
-                'phone' => $request->phone,
                 'statut' => $request->statut,
                 'date_inscription' => $request->date_inscription,
             ]);

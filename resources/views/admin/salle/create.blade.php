@@ -27,6 +27,18 @@
                             <input id="localisation" name="localisation" type="text" class="mt-1 p-3 w-full border border-gray-300 rounded-md" value="{{ old('localisation') }}">
                             @error('localisation')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
                         </div>
+                        <div>
+                            <label for="batiment_id" class="block text-sm font-medium text-gray-700">Bâtiment</label>
+                            <select id="batiment_id" name="batiment_id" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
+                                <option value="">--</option>
+                                @foreach(($batiments ?? collect()) as $b)
+                                    <option value="{{ $b->id }}" {{ old('batiment_id') == $b->id ? 'selected' : '' }}>
+                                        {{ $b->code }} — {{ $b->nom }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('batiment_id')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                        </div>
                         <div class="pt-2 flex space-x-3">
                             <button type="submit" class="px-4 py-2 bg-purple-700 hover:bg-purple-500 text-white rounded-md">Enregistrer</button>
                             <a href="{{ route('salles.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Annuler</a>

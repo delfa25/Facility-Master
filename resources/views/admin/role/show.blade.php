@@ -8,17 +8,17 @@
         @include('partials.navbar')
         <main class="flex-1 p-6 items-center overflow-auto">
             <div class="max-w-3xl ml-[250px]">
-                <h1 class="text-2xl font-bold mb-6">Nom {{ $roles->name }}</h1>
+                <h1 class="text-2xl font-bold mb-6">Nom {{ $role->name }}</h1>
                 <div class="bg-white rounded-lg shadow p-6">
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <dt class="text-gray-500 text-sm">Nom</dt>
-                            <dd class="font-semibold">{{ $roles->name }}</dd>
+                            <dd class="font-semibold">{{ $role->name }}</dd>
                         </div>
                     </dl>
 
                     <div class="mt-6 flex space-x-3">
-                        <a href="{{ route('roles.edit', $roles) }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">Modifier</a>
+                        <a href="{{ route('roles.edit', $role) }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">Modifier</a>
                         <a href="{{ route('roles.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Retour</a>
                     </div>
                 </div>

@@ -26,6 +26,7 @@
                                     <th class="border border-gray-300 px-4 py-2 text-left">Code</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Capacité</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Localisation</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Bâtiment</th>
                                     <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
                                 </tr>
                             </thead>
@@ -35,6 +36,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ $s->code }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $s->capacite }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $s->localisation }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ optional($s->batiment)->code }} {{ optional($s->batiment)->nom ? '— ' . optional($s->batiment)->nom : '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <div class="flex space-x-2">
                                                 <a class="text-blue-600 hover:text-blue-900" href="{{ route('salles.show', $s) }}">Voir</a>
@@ -49,7 +51,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="border border-gray-300 px-4 py-8 text-center text-gray-500">Aucune salle</td>
+                                        <td colspan="5" class="border border-gray-300 px-4 py-8 text-center text-gray-500">Aucune salle</td>
                                     </tr>
                                 @endforelse
                             </tbody>

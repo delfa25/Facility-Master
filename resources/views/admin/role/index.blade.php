@@ -30,12 +30,12 @@
                             <tbody>
                                 @forelse($roles as $role)
                                     <tr class="hover:bg-gray-50">
-                                        <td class="border border-gray-300 px-4 py-2">{{ $roles->name }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $role->name }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <div class="flex space-x-2">
-                                                <a class="text-blue-600 hover:text-blue-900" href="{{ route('roles.show', $roles) }}">Voir</a>
-                                                <a class="text-green-600 hover:text-green-900" href="{{ route('roles.edit', $roles) }}">Modifier</a>
-                                                <form action="{{ route('roles.destroy', $roles) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ce profil ?')">
+                                                <a class="text-blue-600 hover:text-blue-900" href="{{ route('roles.show', $role) }}">Voir</a>
+                                                <a class="text-green-600 hover:text-green-900" href="{{ route('roles.edit', $role) }}">Modifier</a>
+                                                <form action="{{ route('roles.destroy', $role) }}" method="POST" class="inline" onsubmit="return confirm('Supprimer ce profil ?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-600 hover:text-red-900">Supprimer</button>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4">{{ $role->links() }}</div>
+                <div class="mt-4">{{ $roles->links() }}</div>
             </div>
         </main>
     </div>

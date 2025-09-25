@@ -70,8 +70,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">INE</label>
-                                    <input type="text" name="INE" value="{{ old('INE') }}" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
-                                    @error('INE')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                                    <div class="mt-2 text-gray-600 text-sm">L'INE sera généré automatiquement lors de l'enregistrement.</div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Date d'inscription</label>

@@ -12,6 +12,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use Illuminate\Support\Facades\Hash;
+use App\Support\IdGenerator;
 
 class UserController extends Controller
 {
@@ -71,9 +72,10 @@ class UserController extends Controller
 
         switch ($request->role) {
             case 'ETUDIANT':
+                $ine = $request->INE ?: (method_exists(IdGenerator::class, 'generateINE') ? IdGenerator::generateINE() : null);
                 Etudiant::create([
                     'user_id' => $user->id,
-                    'INE' => $request->INE,
+                    'INE' => $ine,
                     'date_inscription' => $request->date_inscription,
                     'statut' => $request->statut_etudiant ?: 'INACTIF',
                 ]);
@@ -163,15 +165,11 @@ class UserController extends Controller
         switch ($request->role) {
             case 'ETUDIANT':
                 $et = $user->etudiant ?: new Etudiant(['user_id' => $user->id]);
+                $ine = $request->INE ?: ($et->INE ?? (method_exists(IdGenerator::class, 'generateINE') ? IdGenerator::generateINE() : null));
                 $et->fill([
-                    'INE' => $request->INE,
+                    'INE' => $ine,
                     'date_inscription' => $request->date_inscription,
                     'statut' => $request->statut_etudiant ?: $et->statut,
-                    'nom' => $request->nom,
-                    'prenom' => $request->prenom,
-                    'date_naissance' => $request->date_naissance,
-                    'lieu_naissance' => $request->lieu_naissance,
-                    'phone' => $request->phone,
                 ]);
                 $et->user_id = $user->id;
                 $et->save();
@@ -182,11 +180,6 @@ class UserController extends Controller
                     'grade' => $request->grade,
                     'specialite' => $request->specialite,
                     'statut' => $request->statut_enseignant ?: $ens->statut,
-                    'nom' => $request->nom,
-                    'prenom' => $request->prenom,
-                    'date_naissance' => $request->date_naissance,
-                    'lieu_naissance' => $request->lieu_naissance,
-                    'phone' => $request->phone,
                 ]);
                 $ens->user_id = $user->id;
                 $ens->save();

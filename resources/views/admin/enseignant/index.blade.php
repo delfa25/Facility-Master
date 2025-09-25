@@ -53,7 +53,7 @@
                                 @forelse($enseignants as $enseignant)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->id }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $enseignant->prenom ?? '' }} {{ $enseignant->nom ?? '' }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ optional($enseignant->user)->prenom ?? '' }} {{ optional($enseignant->user)->nom ?? '' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->grade ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->specialite ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $enseignant->statut ?? '-' }}</td>

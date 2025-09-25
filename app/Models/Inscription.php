@@ -35,8 +35,8 @@ class Inscription extends Model
         return $this->belongsTo(Classe::class);
     }
 
-    public function anneeAcad()
+    public function academicYear()
     {
-        return $this->belongsTo(AnneeAcad::class, 'annee_id');
+        return $this->belongsTo(AcademicYear::class, 'annee_id');
     }
 }

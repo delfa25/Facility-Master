@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AnneeAcad;
+use App\Models\AcademicYear;
 use App\Models\Classe;
 use App\Models\Enseignant;
 use App\Models\Filiere;
@@ -16,7 +16,7 @@ class ClasseController extends Controller
     public function index(Request $request)
     {
         $q = trim((string) $request->get('q', ''));
-        $query = Classe::with(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
+        $query = Classe::with(['filiere','niveau','salle','academicYear','responsableEnseignant']);
         if ($q !== '') {
             $query->where('code', 'like', "%{$q}%")
                   ->orWhere('nom', 'like', "%{$q}%")
@@ -32,7 +32,7 @@ class ClasseController extends Controller
         $filieres = Filiere::orderBy('nom')->get();
         $niveaux = Niveau::ordered()->get();
         $salles  = Salle::orderBy('code')->get();
-        $annees  = AnneeAcad::orderByDesc('date_debut')->get();
+        $annees  = AcademicYear::orderByDesc('start_date')->get();
         $enseignants = Enseignant::orderBy('id','desc')->get();
         return view('admin.classe.create', compact('filieres','niveaux','salles','annees','enseignants'));
     }
@@ -45,7 +45,7 @@ class ClasseController extends Controller
             'filiere_id' => ['required','exists:filiere,id'],
             'niveau_id'  => ['required','exists:niveau,id'],
             'salle_id'   => ['nullable','exists:salle,id'],
-            'annee_id'   => ['nullable','exists:annee_acad,id'],
+            'annee_id'   => ['nullable','exists:academic_years,id'],
             'responsable_enseignant_id' => ['nullable','exists:enseignant,id'],
         ]);
 
@@ -55,17 +55,17 @@ class ClasseController extends Controller
 
     public function show(Classe $classe)
     {
-        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
+        $classe->load(['filiere','niveau','salle','academicYear','responsableEnseignant']);
         return view('admin.classe.show', compact('classe'));
     }
 
     public function edit(Classe $classe)
     {
-        $classe->load(['filiere','niveau','salle','anneeAcad','responsableEnseignant']);
+        $classe->load(['filiere','niveau','salle','academicYear','responsableEnseignant']);
         $filieres = Filiere::orderBy('nom')->get();
         $niveaux = Niveau::ordered()->get();
         $salles  = Salle::orderBy('code')->get();
-        $annees  = AnneeAcad::orderByDesc('date_debut')->get();
+        $annees  = AcademicYear::orderByDesc('start_date')->get();
         $enseignants = Enseignant::orderBy('id','desc')->get();
         return view('admin.classe.edit', compact('classe','filieres','niveaux','salles','annees','enseignants'));
     }
@@ -78,7 +78,7 @@ class ClasseController extends Controller
             'filiere_id' => ['required','exists:filiere,id'],
             'niveau_id'  => ['required','exists:niveau,id'],
             'salle_id'   => ['nullable','exists:salle,id'],
-            'annee_id'   => ['nullable','exists:annee_acad,id'],
+            'annee_id'   => ['nullable','exists:academic_years,id'],
             'responsable_enseignant_id' => ['nullable','exists:enseignant,id'],
         ]);
 

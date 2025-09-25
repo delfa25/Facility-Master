@@ -19,9 +19,13 @@
                             <dt class="text-gray-500 text-sm">Capacité</dt>
                             <dd class="font-semibold">{{ $salle->capacite }}</dd>
                         </div>
-                        <div class="md:col-span-2">
+                        <div>
                             <dt class="text-gray-500 text-sm">Localisation</dt>
                             <dd class="font-semibold">{{ $salle->localisation }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-gray-500 text-sm">Bâtiment</dt>
+                            <dd class="font-semibold">{{ optional($salle->batiment)->code }} {{ optional($salle->batiment)->nom ? '— ' . optional($salle->batiment)->nom : '' }}</dd>
                         </div>
                     </dl>
 

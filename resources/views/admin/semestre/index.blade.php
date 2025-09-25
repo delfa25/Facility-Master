@@ -34,7 +34,7 @@
                                 @forelse($semestres as $s)
                                     <tr class="hover:bg-gray-50">
                                         <td class="border border-gray-300 px-4 py-2">{{ $s->code }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ optional($s->anneeAcad)->code }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ optional($s->academicYear)->name }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($s->date_debut)->format('d/m/Y') }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($s->date_fin)->format('d/m/Y') }}</td>
                                         <td class="border border-gray-300 px-4 py-2">

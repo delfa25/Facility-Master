@@ -58,7 +58,7 @@
                                 <select id="annee_id" name="annee_id" class="mt-1 p-3 w-full border border-gray-300 rounded-md">
                                     <option value="">--</option>
                                     @foreach($annees as $a)
-                                        <option value="{{ $a->id }}" {{ old('annee_id') == $a->id ? 'selected' : '' }}>{{ $a->code }}</option>
+                                        <option value="{{ $a->id }}" {{ old('annee_id') == $a->id ? 'selected' : '' }}>{{ $a->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('annee_id')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror

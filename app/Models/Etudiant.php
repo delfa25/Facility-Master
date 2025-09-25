@@ -104,4 +104,21 @@ class Etudiant extends Model
     {
         return $query->where('statut', 'DIPLOME');
     }
+
+    /**
+     * When an Etudiant profile is deleted, also delete the linked User
+     * to keep data consistent (reverse cascade).
+     */
+    protected static function booted()
+    {
+        static::deleting(function (Etudiant $etudiant) {
+            // If this is a force delete scenario and relation exists
+            if ($etudiant->user) {
+                // Delete linked user without firing its events to avoid recursion
+                \App\Models\User::withoutEvents(function () use ($etudiant) {
+                    $etudiant->user->delete();
+                });
+            }
+        });
+    }
 }

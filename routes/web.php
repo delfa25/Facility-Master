@@ -65,7 +65,6 @@ Route::middleware('auth')->group(function () {
             ->only(['index','create','store']);
 
         Route::resource('filieres', \App\Http\Controllers\FiliereController::class);
-        Route::resource('annees', \App\Http\Controllers\AnneeAcadController::class);
         Route::resource('niveaux', \App\Http\Controllers\NiveauController::class);
         Route::resource('semestres', \App\Http\Controllers\SemestreController::class);
         Route::resource('salles', \App\Http\Controllers\SalleController::class);
@@ -75,6 +74,9 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('roles', \App\Http\Controllers\RoleController::class);
         Route::resource('permissions', \App\Http\Controllers\PermissionController::class);
+
+        // Academic Years
+        Route::resource('academic-years', \App\Http\Controllers\AcademicYearController::class);
 
         Route::get('/parametres', [\App\Http\Controllers\ParametreController::class, 'parametreIndex'])->name('parametres.index');
     });

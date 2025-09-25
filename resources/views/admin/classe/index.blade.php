@@ -41,7 +41,7 @@
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($c->filiere)->nom }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($c->niveau)->code }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($c->salle)->code }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ optional($c->anneeAcad)->code }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ optional($c->academicYear)->name }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($c->responsableEnseignant)->prenom }} {{ optional($c->responsableEnseignant)->nom }}</td>
                                         <td class="border border-gray-300 px-4 py-2">
                                             <div class="flex space-x-2">

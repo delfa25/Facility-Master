@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AnneeAcad;
+use App\Models\AcademicYear;
 use App\Models\Classe;
 use App\Models\Etudiant;
 use App\Models\Inscription;
@@ -20,7 +20,7 @@ class InscriptionController extends Controller
         $anneeId = $request->get('annee_id');
         $q = trim((string) $request->get('q', ''));
 
-        $query = Inscription::with(['etudiant','classe','anneeAcad']);
+        $query = Inscription::with(['etudiant','classe','academicYear']);
 
         if ($etudiantId) {
             $query->where('etudiant_id', $etudiantId);
@@ -40,15 +40,15 @@ class InscriptionController extends Controller
             })->orWhereHas('classe', function($sub) use ($q) {
                 $sub->where('libelle', 'like', "%{$q}%")
                     ->orWhere('code', 'like', "%{$q}%");
-            })->orWhereHas('anneeAcad', function($sub) use ($q) {
-                $sub->where('annee', 'like', "%{$q}%");
+            })->orWhereHas('academicYear', function($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%");
             });
         }
 
         $inscriptions = $query->orderByDesc('date_inscription')->paginate(15)->withQueryString();
 
         $classes = Classe::orderBy('libelle')->get();
-        $annees = AnneeAcad::orderByDesc('annee')->get();
+        $annees = AcademicYear::orderByDesc('start_date')->get();
 
         return view('admin.inscription.index', compact('inscriptions','classes','annees','etudiantId','classeId','anneeId','q'));
     }
@@ -75,7 +75,7 @@ class InscriptionController extends Controller
         $request->validate([
             'etudiant_id' => ['required','exists:etudiant,id'],
             'classe_id' => ['required','exists:classe,id'],
-            'annee_id' => ['required','exists:annee_acad,id'],
+            'annee_id' => ['required','exists:academic_years,id'],
             'date_inscription' => ['nullable','date'],
         ]);
 

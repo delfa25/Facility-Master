@@ -9,6 +9,13 @@
         <main class="flex-1 p-6 items-center overflow-auto">
             <div class="max-w-6xl ml-[250px]">
                 <h1 class="text-2xl font-bold mb-6 text-center">Reporting des inscriptions</h1>
+                @role('SUPERADMIN')
+                <div class="mb-4 flex justify-end">
+                    <a href="{{ route('inscriptions.create') }}" class="inline-flex items-center px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-500">
+                        + Nouvelle inscription
+                    </a>
+                </div>
+                @endrole
 
                 <form method="GET" action="{{ route('inscriptions.index') }}" class="flex flex-wrap items-end gap-3 mb-4">
                     <div>
@@ -29,7 +36,7 @@
                         <select name="annee_id" class="p-2 border rounded w-48">
                             <option value="">Toutes</option>
                             @foreach($annees as $a)
-                                <option value="{{ $a->id }}" {{ ($anneeId ?? '') == $a->id ? 'selected' : '' }}>{{ $a->annee ?? ('Année #'.$a->id) }}</option>
+                                <option value="{{ $a->id }}" {{ ($anneeId ?? '') == $a->id ? 'selected' : '' }}>{{ $a->name ?? ('Année #'.$a->id) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -58,7 +65,7 @@
                                         </td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $ins->etudiant->INE ?? '-' }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ $ins->classe->libelle ?? ($ins->classe->code ?? ('Classe #'.$ins->classe_id)) }}</td>
-                                        <td class="border border-gray-300 px-4 py-2">{{ $ins->anneeAcad->annee ?? ('Année #'.$ins->annee_id) }}</td>
+                                        <td class="border border-gray-300 px-4 py-2">{{ $ins->academicYear->name ?? ('Année #'.$ins->annee_id) }}</td>
                                         <td class="border border-gray-300 px-4 py-2">{{ optional($ins->date_inscription)->format('d/m/Y') }}</td>
                                     </tr>
                                 @empty

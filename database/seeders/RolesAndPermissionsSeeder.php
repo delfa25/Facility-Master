@@ -12,11 +12,18 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $permissions = [
-            'user.view','user.create','user.update','user.delete',
-            'etudiant.view','etudiant.create','etudiant.update','etudiant.delete',
-            'enseignant.view','enseignant.create','enseignant.update','enseignant.delete',
+        // Declare permissions per resource (view/create/update/delete)
+        $resources = [
+            'user', 'etudiant', 'enseignant', 'filiere', 'academic_year', 'niveau', 'semestre', 'salle', 'typeseance', 'classe', 'cycle', 'inscription', 'role', 'permission',
         ];
+
+        $permissions = [];
+        foreach ($resources as $res) {
+            $permissions[] = "$res.view";
+            $permissions[] = "$res.create";
+            $permissions[] = "$res.update";
+            $permissions[] = "$res.delete";
+        }
 
         foreach ($permissions as $p) {
             Permission::firstOrCreate(['name' => $p]);
@@ -25,8 +32,13 @@ class RolesAndPermissionsSeeder extends Seeder
         $roles = [
             'ETUDIANT' => ['etudiant.view'],
             'ENSEIGNANT' => ['enseignant.view'],
-            'ADMINISTRATEUR' => $permissions,
-            'SUPERADMIN' => $permissions,
+            // ADMINISTRATEUR: grant broad management but not security (role/permission)
+            'ADMINISTRATEUR' => collect($permissions)
+                ->reject(fn($p) => str_starts_with($p, 'role.') || str_starts_with($p, 'permission.'))
+                ->values()
+                ->all(),
+            // SUPERADMIN: all existing permissions
+            'SUPERADMIN' => Permission::pluck('name')->all(),
             'INVITE' => [],
         ];
 

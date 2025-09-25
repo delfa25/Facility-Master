@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AnneeAcad;
+use App\Models\AcademicYear;
 use App\Models\Semestre;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,11 +12,11 @@ class SemestreController extends Controller
     public function index(Request $request)
     {
         $q = trim((string) $request->get('q', ''));
-        $query = Semestre::with('anneeAcad');
+        $query = Semestre::with('academicYear');
         if ($q !== '') {
             $query->where('code', 'like', "%{$q}%")
-                  ->orWhereHas('anneeAcad', function($sub) use ($q) {
-                      $sub->where('code', 'like', "%{$q}%");
+                  ->orWhereHas('academicYear', function($sub) use ($q) {
+                      $sub->where('name', 'like', "%{$q}%");
                   });
         }
         $semestres = $query->orderByDesc('date_debut')->paginate(15)->withQueryString();
@@ -25,7 +25,7 @@ class SemestreController extends Controller
 
     public function create()
     {
-        $annees = AnneeAcad::orderByDesc('date_debut')->get();
+        $annees = AcademicYear::orderByDesc('start_date')->get();
         return view('admin.semestre.create', compact('annees'));
     }
 
@@ -33,7 +33,7 @@ class SemestreController extends Controller
     {
         $request->validate([
             'code' => ['required','string','max:50', Rule::unique('semestre','code')],
-            'annee_id' => ['required','exists:annee_acad,id'],
+            'annee_id' => ['required','exists:academic_years,id'],
             'date_debut' => ['required','date'],
             'date_fin' => ['required','date','after:date_debut'],
         ]);
@@ -44,13 +44,13 @@ class SemestreController extends Controller
 
     public function show(Semestre $semestre)
     {
-        $semestre->load('anneeAcad');
+        $semestre->load('academicYear');
         return view('admin.semestre.show', compact('semestre'));
     }
 
     public function edit(Semestre $semestre)
     {
-        $annees = AnneeAcad::orderByDesc('date_debut')->get();
+        $annees = AcademicYear::orderByDesc('start_date')->get();
         return view('admin.semestre.edit', compact('semestre','annees'));
     }
 
@@ -58,7 +58,7 @@ class SemestreController extends Controller
     {
         $request->validate([
             'code' => ['required','string','max:50', Rule::unique('semestre','code')->ignore($semestre->id)],
-            'annee_id' => ['required','exists:annee_acad,id'],
+            'annee_id' => ['required','exists:academic_years,id'],
             'date_debut' => ['required','date'],
             'date_fin' => ['required','date','after:date_debut'],
         ]);

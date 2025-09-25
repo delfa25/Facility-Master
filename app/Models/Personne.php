@@ -17,4 +17,18 @@ class Personne extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Reverse cascade: when a Personne profile is deleted, also delete the linked User.
+     */
+    protected static function booted()
+    {
+        static::deleting(function (Personne $personne) {
+            if ($personne->user) {
+                \App\Models\User::withoutEvents(function () use ($personne) {
+                    $personne->user->delete();
+                });
+            }
+        });
+    }
 }

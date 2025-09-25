@@ -64,7 +64,7 @@
                                         @foreach($etudiant->inscriptions as $ins)
                                             <tr class="hover:bg-gray-50">
                                                 <td class="border border-gray-300 px-4 py-2">{{ $ins->classe->libelle ?? ($ins->classe->code ?? ('Classe #'.$ins->classe_id)) }}</td>
-                                                <td class="border border-gray-300 px-4 py-2">{{ $ins->anneeAcad->annee ?? ('Année #'.$ins->annee_id) }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">{{ $ins->academicYear->name ?? ('Année #'.$ins->annee_id) }}</td>
                                                 <td class="border border-gray-300 px-4 py-2">{{ optional($ins->date_inscription)->format('d/m/Y') }}</td>
                                             </tr>
                                         @endforeach

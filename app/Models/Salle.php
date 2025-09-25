@@ -15,6 +15,7 @@ class Salle extends Model
         'code',
         'capacite',
         'localisation',
+        'batiment_id',
     ];
 
     /**
@@ -47,6 +48,14 @@ class Salle extends Model
     public function seanceExceptions()
     {
         return $this->hasMany(SeanceException::class);
+    }
+
+    /**
+     * Relation avec le bâtiment (localisation)
+     */
+    public function batiment()
+    {
+        return $this->belongsTo(Batiment::class);
     }
 
     /**

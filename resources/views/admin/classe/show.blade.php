@@ -33,7 +33,7 @@
                         </div>
                         <div>
                             <dt class="text-gray-500 text-sm">Année académique</dt>
-                            <dd class="font-semibold">{{ optional($classe->anneeAcad)->code }}</dd>
+                            <dd class="font-semibold">{{ optional($classe->academicYear)->name }}</dd>
                         </div>
                         <div class="md:col-span-2">
                             <dt class="text-gray-500 text-sm">Responsable</dt>
